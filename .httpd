@@ -1,0 +1,24 @@
+# WSGI apache virtual host name server
+# https://docs.djangoproject.com/en/1.9/howto/deployment/wsgi/modwsgi/
+
+
+#NameVirtualHost *:80
+
+<VirtualHost *:80>
+    ServerName doconnel.master.cs.haverford.edu 
+    KeepAlive Off
+    WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
+    WSGIPythonPath /path/to/mysite.com
+
+   <Directory /homes/doconnel/quizfiles/quizsite/quizsite/wsgi.py>
+   <Files wsgi.py>
+   Require all granted
+   </Files>
+   </Directory>
+
+    #WSGIDaemonProcess doconnel.master.cs.haverford.edu processes=1 threads=20 inactivity-timeout=60 display-name=quizsite] httpd
+    #WSGIProcessGroup  doconnel.master.cs.haverford.edu
+    #WSGIScriptAlias / /homes/doconnel/quizfiles/quizsite/quizsite/wsgi.py
+
+</VirtualHost>
+
