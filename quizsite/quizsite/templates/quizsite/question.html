@@ -1,8 +1,34 @@
-% if question  %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>Quiz {{quiz.id}}</title>
+</head>
+<body>
+
+<h1>Question {{question.id}}:</h1>
+<p></p>
+
+ <form>
+ <fieldset>
+    <legend>{{question.text}}</legend>
+    {% if question  %}
     <ul>
-    <li><a href="/ </li>
+        {% for answer in answer_list  %}
+<!--http://django.readthedocs.org/en/latest/intro/tutorial04.html -->
+             <input type="radio" name="answer" id = "answer{{forloop.counter }}" value= "{{ answer.id}}"
+             <label for="answer{{ forloop.counter }}">{{ answer.text}}</label><br />
+        {% endfor %}
     </ul>
-{% else %}
-    <p>No question found.</p>
-{% endif %}
+        <input type="submit" value="Submit" />
+   {% else %}
+       <p>No valid question here.</p>
+   {% endif %}
+
+
+  </fieldset>
+</form>
+
+
+</body>
+</html>
 

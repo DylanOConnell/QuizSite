@@ -1,10 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Quizzes</title>
+</head>
+<body>
+
+<h1>List of Available Quizzes</h1>
+<p></p>
+
 {% if quizzes_list %}
     <ul>
     {% for quiz in quizzes_list %}
-        <li><a href="/quizsite/{{ quiz.id }}/">{{ quiz.id}}</a></li>
+        <li><a href="/quizzes/{{ quiz.id }}/1/">{{ quiz.id}}</a></li>
     {% endfor %}
     </ul>
 {% else %}
     <p>No quizzes here.</p>
 {% endif %}
-
+</body>
