@@ -18,13 +18,10 @@ def quizzes(request):
 # view for viewing a question. Needs both the associated quiz and question id
 def question(request, quiz_id, question_id):
 	quiz = get_object_or_404(Quiz,pk = quiz_id)
+	# we use a filter to find only the question with this id within this quiz M2M field
+	# Thus, if this question does not belong to this quiz, we will say no question exists
 	question = quiz.questions.filter(pk = question_id)
-#	if quiz.questions.filter(pk = question_id):
-#		question = get_object_or_404(Question, pk = question_id)
-#	else:
-#		question = None
-	# We use the relation manager in Django to find all answers associated with a certain question
-#	answer_list = question.answer_set.all
+	# We use a filter to find all answers that have the requisite question_id
 	answer_list = Answer.objects.filter(question__id = question_id)
 	template = loader.get_template('quizsite/question.html')
 	context = {
