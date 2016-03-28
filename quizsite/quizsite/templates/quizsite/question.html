@@ -28,6 +28,11 @@
   </fieldset>
 </form>
 
+   {% if next_question %}
+<p> The next question is {{next_question.id}}</p>
+   {% else %}
+   <p> Final question in the quiz" </p>
+   {% endif %}
 
 </body>
 </html>

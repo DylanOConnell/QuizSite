@@ -26,11 +26,18 @@ def question(request, quiz_id, question_id):
 	#question = get_object_or_404(Question, pk = question_id) 
 	# We use a filter to find all answers that have the requisite question_id
 	answer_list = Answer.objects.filter(question__id = question_id)
+	try:
+		next_question = Question.objects.get(quiz__id = quiz.id, questionordering__ordering =  ( question.questionordering_set.get(quiz_id = question.quiz_set.get().id).ordering+1))
+	except:
+		next_question = None	
+	#next_question =dQuestion.objects.get((question.questionordering_set.get(quiz.id = quiz_id).ordering +1)
+	#next_question = Question.objects.filter(quiz__id = quiz_id, questionordering__ordering = question.questionoordering__ordering + 1)
 	template = loader.get_template('quizsite/question.html')
 	context = {
 		'quiz' : quiz,
 		'question' : question,
 		'answer_list' : answer_list,
+		'next_question' : next_question,
 	}
 	return HttpResponse(template.render(context,request))
 
