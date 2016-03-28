@@ -8,30 +8,34 @@
 <h1>Question {{question.id}}:</h1>
 <p></p>
 
- <form>
- <fieldset>
-    <legend>{{question.text}}</legend>
-    {% if question  %}
-    <ul>
+  <form>
+  <fieldset>
+     <legend>{{question.text}}</legend>
+     {% if question  %}
+     <ul>
         {% for answer in answer_list  %}
-<!--http://django.readthedocs.org/en/latest/intro/tutorial04.html -->
-             <input type="radio" name="answer" id = "answer{{forloop.counter }}" value= "{{ answer.id}}"
-             <label for="answer{{ forloop.counter }}">{{ answer.text}}</label><br />
+            <input type="radio" name="answer" id = "answer{{forloop.counter }}" value= "{{ answer.id}}"
+            <label for="answer{{ forloop.counter }}">{{ answer.text}}</label><br />
         {% endfor %}
-    </ul>
-        <input type="submit" value="Submit" />
+     </ul>
+     <input type="submit" value="Submit" />
+     {% else %}
+        <p>No valid question here.</p>
+     {% endif %}
+   </fieldset><br />
+   </form>
+
+   {% if prev_question %}
+      <li><a href="/quizzes/{{ quiz.id }}/{{prev_question.id }}/">Previous: Question {{ prev_question.id}}</a></li>
    {% else %}
-       <p>No valid question here.</p>
+      <p> First question in the quiz. </p>
    {% endif %}
 
-
-  </fieldset>
-</form>
-
+   <br />
    {% if next_question %}
-<p> The next question is {{next_question.id}}</p>
+      <li><a href="/quizzes/{{ quiz.id }}/{{next_question.id }}/">Next: Question {{ next_question.id}}</a></li>
    {% else %}
-   <p> Final question in the quiz" </p>
+       <p> Final question in the quiz. </p>
    {% endif %}
 
 </body>

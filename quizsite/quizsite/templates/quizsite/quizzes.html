@@ -11,7 +11,7 @@
 {% if quizzes_list %}
     <ul>
     {% for quiz in quizzes_list %}
-        <li><a href="/quizzes/{{ quiz.id }}/{{ quiz.questions.all.0.id }}/">{{ quiz.id}}</a></li>
+        <li><a href="/quizzes/{{ quiz.id }}/{{ quiz.questions.all.0.id }}/">Quiz #{{ quiz.id}}</a></li>
        <!-- <li><a href="/quizzes/{{ quiz.id }}/{{ quiz.questions.all.0.id }}/">{{ quiz.id}}</a></li>-->
     {% endfor %}
     </ul>
