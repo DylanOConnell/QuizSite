@@ -2,12 +2,17 @@ from django.db import models
 
 class Quiz(models.Model):
     name = models.CharField(max_length=200,null=True)
-    questions = models.ManyToManyField('Question')
+    questions = models.ManyToManyField('Question',through ='QuestionOrdering')
    # questions = models.ManyToManyField(Question) #CASEY: Similarly, do we actually want an M2M field here? #Dylan: Actually in this case I think I would like to be able to reuse questions between quizzes. I did change the other instances where a FK would be better!
 
 class Question(models.Model):
     text = models.CharField(max_length=200)
    # quiz = models.ForeignKey(Quiz,null=True,blank=True)
+
+class QuestionOrdering(models.Model):
+    quiz = models.ForeignKey(Quiz)
+    question = models.ForeignKey(Question)
+    ordering = models.PositiveIntegerField()
 
 class Answer(models.Model):
     text = models.CharField(max_length=200)
