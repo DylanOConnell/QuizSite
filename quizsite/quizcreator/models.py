@@ -35,12 +35,12 @@ class User(models.Model):
     user_choices = ( (admin, 'Admin'), (reg_user, 'User'))
     user_type = models.CharField(max_length=3,choices = user_choices,default = reg_user)
 
-class Quiz_results(models.Model):
+class QuizResults(models.Model):
     score = models.IntegerField(default=0)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User,null=True)
     quiz = models.ForeignKey(Quiz)
 
-class Answer_results(models.Model):
+class AnswerResults(models.Model):
     quiz = models.ForeignKey(Quiz)
     question = models.ForeignKey(Question)
     answer = models.ForeignKey(Answer)

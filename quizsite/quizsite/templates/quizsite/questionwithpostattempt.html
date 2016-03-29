@@ -8,6 +8,8 @@
 <h1>Question {{question.id}}:</h1>
 <p></p>
 
+ <!-- <form action="{% url 'quizsite:quizzes' %}" method="post">
+  {% csrf_token %} -->
   <form>
   <fieldset>
      <legend>{{question.text}}</legend>
@@ -26,14 +28,14 @@
    </form>
 
    {% if prev_question %}
-      <li><a href="{% url 'quizzes:question' quiz.id prev_question.id %}">Previous: Question {{ prev_question.id}}</a></li>
+      <li><a href="/quizzes/{{ quiz.id }}/{{prev_question.id }}/">Previous: Question {{ prev_question.id}}</a></li>
    {% else %}
       <p> First question in the quiz. </p>
    {% endif %}
 
    <br />
    {% if next_question %}
-      <li><a href="{% url 'quizzes:question' quiz.id next_question.id %}">Next: Question {{ next_question.id}}</a></li>
+      <li><a href="/quizzes/{{ quiz.id }}/{{next_question.id }}/">Next: Question {{ next_question.id}}</a></li>
    {% else %}
        <p> Final question in the quiz. </p>
    {% endif %}

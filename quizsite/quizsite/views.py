@@ -43,6 +43,20 @@ def question(request, quiz_id, question_id):
 	}
 	return HttpResponse(template.render(context,request))
 
+"""
+	def answer(request,quiz_id,question_id){
+	question = get_object_or_404(Question, pk = question_id)
+	try:
+		userchoice = question.answer_set(pk = request.POST['answer'])
+	except:
+		userchoice = None
+	else:
+		newquizresult = models.QuizResult(quiz = quiz_id)
+		newanswerresult = models.AnswerResult(question = question_id, answer = userchoice, selected = True)  
+	}
+
+"""
+
 #def createquiz(request):
 #	template = loader.get_template('quizsite/createquiz.html')
 #	context = {
