@@ -10,11 +10,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 #    url(r'^login/$', views.login, name='login'),
     url(r'^quizzes/', include('quizcreator.urls', namespace = "quizzes", app_name =' quizcreator')),
-   # url(r'^quizzes/$', views.quizzes, name='quizzes'),
 #    url(r'^createquestion/$', views.createquestion, name='createquestion'),
-   
-    #url(r'^quizzes/(?P<quiz_id>[0-9]+)/(?P<question_id>[0-9]+)/$', views.question, name='question'),
-#    url(r'^quizzes/(?P<quiz_id>[0-9]+)/(?P<question_id>[0-9]+)/answer$', views.answer, name='answer'),
 #    url(r'^(?P<quiz_id>[0-9]+)/results/$', views.results, name='results'),
 
 
