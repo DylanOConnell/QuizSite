@@ -25,20 +25,27 @@ def question(request, quiz_id, question_id):
 	answer_list = Answer.objects.filter(question__id = question_id)
 	# We find the next and previous question using questionordering, if they exist
 	try:
-		next_question = Question.objects.get(quiz__id = quiz.id, questionordering__ordering =  ( question.questionordering_set.get(quiz_id = question.quiz_set.get().id).ordering+1))
+		#next_question = Question.objects.get(quiz__id = quiz.id, questionordering__ordering =  ( question.questionordering_set.get(quiz_id = question.quiz_set.get().id).ordering+1))
+		next_question = Question.objects.get(quiz__id = quiz.id, questionordering__ordering =  ( question.questionordering_set.get(quiz_id = quiz.id).ordering+1))
+		next_question_number = next_question.questionordering_set.get(quiz_id = quiz.id).ordering
 	except:
 		next_question = None	
+		next_question_number = None
 	try:
-                prev_question = Question.objects.get(quiz__id = quiz.id, questionordering__ordering =  ( question.questionordering_set.get(quiz_id = question.quiz_set.get().id).ordering-1))
+                prev_question = Question.objects.get(quiz__id = quiz.id, questionordering__ordering =  ( question.questionordering_set.get(quiz_id = quiz.id).ordering-1))
+		prev_question_number = prev_question.questionordering_set.get(quiz_id = quiz.id).ordering
         except:
                 prev_question = None
+		prev_question_number = None
 	template = loader.get_template('quizsite/question.html')
 	context = {
 		'quiz' : quiz,
 		'question' : question,
 		'answer_list' : answer_list,
 		'next_question' : next_question,
+		'next_question_number' : next_question_number,
 		'prev_question' : prev_question,
+		'prev_question_number' : prev_question_number,
 	}
 	return HttpResponse(template.render(context,request))
 
