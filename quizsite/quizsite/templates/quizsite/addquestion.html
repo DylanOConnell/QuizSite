@@ -9,7 +9,7 @@
        <form action="{% url 'quizzes:addquestion' %}" method="post">
             {% csrf_token %}
             <ol>
-            {{ form.as_ul }}
+            {{ questionform.as_ul }}
             </ol>
             <input type="submit" value="Add Question" />
        </form>
