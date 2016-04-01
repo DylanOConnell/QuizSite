@@ -5,17 +5,17 @@ from .forms import AddQuestionForm, AddAnswerForm
 from quizcreator.models import Quiz, Question, Answer, QuestionOrdering
 from django.db.models import Max
 
+# This is our basic homepage. For now, provides links to other pages.
 def home(request):
 	return render(request,'quizsite/home.html')
 
 # View for the overall list of quizzes. Each quiz id is shown, and provides a link to the first question of that quiz
 def quizzes(request):
 	quizzes_list = Quiz.objects.all()
-	template = loader.get_template('quizsite/quizzes.html')
 	context = {
 		'quizzes_list' : quizzes_list,
 	}
-	return HttpResponse(template.render(context,request))
+	return render(request,'quizsite/quizzes.html',context)
 
 # view for viewing a question. Needs both the associated quiz and question id
 def question(request, quiz_id, question_id):
@@ -39,7 +39,6 @@ def question(request, quiz_id, question_id):
                 prev_question = None
 		prev_question_number = None
 
-	template = loader.get_template('quizsite/question.html')
 	context = {
 		'quiz' : quiz,
 		'question' : question,
@@ -49,23 +48,21 @@ def question(request, quiz_id, question_id):
 		'prev_question' : prev_question,
 		'prev_question_number' : prev_question_number,
 	}
-	return HttpResponse(template.render(context,request))
+	return render(request,'quizsite/question.html',context)
 
-"""
-	def answer(request,quiz_id,question_id){
-	question = get_object_or_404(Question, pk = question_id)
-	try:
-		userchoice = question.answer_set(pk = request.POST['answer'])
-	except:
-		userchoice = None
-	else:
-		newquizresult = models.QuizResult(quiz = quiz_id)
-		newanswerresult = models.AnswerResult(question = question_id, answer = userchoice, selected = True)  
-	}
 
-"""
+#	def answer(request,quiz_id,question_id){
+#	question = get_object_or_404(Question, pk = question_id)
+#	try:
+#		userchoice = question.answer_set(pk = request.POST['answer'])
+#	except:
+#		userchoice = None
+#	else:
+#		newquizresult = models.QuizResult(quiz = quiz_id)
+#		newanswerresult = models.AnswerResult(question = question_id, answer = userchoice, selected = True)  
+#	}
 
-# This page has two purposes. It either accepts a post request to create a new question, or it displays a form which can be used to send a post request to create a new question.
+# This page has two purposes. It either accepts a post request to create a new question, or it displays two forms, which can be used to send a post request to create a new question or new answer.
 def addquestion(request):
 	# If post request, we take the informtion from a post request. 
 	if request.method=="POST":
@@ -80,16 +77,17 @@ def addquestion(request):
 			# Then, we display another Form to take in new information
 			questionform = AddQuestionForm()
 			answerform = AddAnswerForm()
+	# if post information not provided, simply display both forms.
 	else:
 		questionform = AddQuestionForm()
 		answerform = AddAnswerForm()
-	template = loader.get_template('quizsite/addquestion.html')
 	context = {
 		'questionform':questionform,
 		'answerform':answerform,
 	}
-	return HttpResponse(template.render(context,request))
+	return render(request,'quizsite/addquestion.html',context)
 
+# This either takes in a POST request to create an answer, or simply redirects to the AddQuestion page.
 def addanswer(request):
 	if request.method=="POST":
 		answerform = AddAnswerForm(data=request.POST)
@@ -98,8 +96,7 @@ def addanswer(request):
 			return redirect('/quizzes/addquestion')
 	else:
 		return redirect('/quizzes/addquestion')
-#		answerform = AddAnswerForm()
-#	return render(request,'quizsite/addquestion.html',context = {'answerform':answerform})
+
 #def createquiz(request):
 #	template = loader.get_template('quizsite/createquiz.html')
 #	context = {
