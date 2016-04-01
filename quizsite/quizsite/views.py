@@ -1,9 +1,12 @@
 from django.http import HttpResponse 
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.template import loader
-from .forms import AddQuestionForm
+from .forms import AddQuestionForm, AddAnswerForm
 from quizcreator.models import Quiz, Question, Answer, QuestionOrdering
 from django.db.models import Max
+
+def home(request):
+	return render(request,'quizsite/home.html')
 
 # View for the overall list of quizzes. Each quiz id is shown, and provides a link to the first question of that quiz
 def quizzes(request):
@@ -76,16 +79,27 @@ def addquestion(request):
 			qordering.save()
 			# Then, we display another Form to take in new information
 			questionform = AddQuestionForm()
+			answerform = AddAnswerForm()
 	else:
 		questionform = AddQuestionForm()
+		answerform = AddAnswerForm()
 	template = loader.get_template('quizsite/addquestion.html')
 	context = {
 		'questionform':questionform,
+		'answerform':answerform,
 	}
 	return HttpResponse(template.render(context,request))
 
-
-
+def addanswer(request):
+	if request.method=="POST":
+		answerform = AddAnswerForm(data=request.POST)
+		if answerform.is_valid():
+			answerform.save()
+			return redirect('/quizzes/addquestion')
+	else:
+		return redirect('/quizzes/addquestion')
+#		answerform = AddAnswerForm()
+#	return render(request,'quizsite/addquestion.html',context = {'answerform':answerform})
 #def createquiz(request):
 #	template = loader.get_template('quizsite/createquiz.html')
 #	context = {

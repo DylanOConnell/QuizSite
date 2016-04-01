@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import ModelForm
 from quizcreator.models import Quiz, Question, Answer, QuestionOrdering
 #from quizcreator.models import Quiz,Question,Answer,QuestionOrdering,QuizResult,AnswerResult
 
@@ -11,4 +12,7 @@ class AddQuestionForm(forms.Form):
 		self.fields['text'].label = "Question Text"
 		self.fields['quiz'].label = "Quiz ID"
 
-	#def __init__(*args,**kwargs):
+class AddAnswerForm(ModelForm):
+	class Meta:
+		model = Answer
+		fields = ['text', 'correct_type', 'question'] 

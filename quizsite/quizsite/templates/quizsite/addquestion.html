@@ -3,7 +3,7 @@
 <html>
     <head>
         <base href="{% url 'quizzes:addquestion' %}" />
-        <title>? "Add Question Forms"</title>
+        <title>"Add Question Forms"</title>
     </head>
     <body>
        <form action="{% url 'quizzes:addquestion' %}" method="post">
@@ -13,6 +13,14 @@
             </ol>
             <input type="submit" value="Add Question" />
        </form>
+       <form action="{% url 'quizzes:addanswer' %}" method="post">
+            {% csrf_token %}
+            <ol>
+            {{ answerform.as_ul }}
+            </ol>
+            <input type="submit" value="Add Answer" />
+       </form>
+
     </body>
 </html>
 

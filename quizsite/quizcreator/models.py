@@ -3,10 +3,15 @@ from django.db import models
 class Quiz(models.Model):
     name = models.CharField(max_length=200,null=True)
     questions = models.ManyToManyField('Question',through ='QuestionOrdering')
+    def __str__(self):
+        return '{} {}'.format('Quiz #:', self.id)
    # questions = models.ManyToManyField(Question) #CASEY: Similarly, do we actually want an M2M field here? #Dylan: Actually in this case I think I would like to be able to reuse questions between quizzes. I did change the other instances where a FK would be better!
 
 class Question(models.Model):
     text = models.CharField(max_length=200)
+    def __str__(self):
+        return '{} {}'.format('Question #:',self.id)
+
   # quiz = models.ForeignKey(Quiz,null=True,blank=True)
 
 class QuestionOrdering(models.Model):
