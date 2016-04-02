@@ -57,7 +57,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-		os.path.join(BASE_DIR, 'templates'),
+#		os.path.join(BASE_DIR, 'templates'),
 		os.path.join(BASE_DIR, 'quizsite','templates')],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -73,6 +73,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'quizsite.wsgi.application'
 
+LOGIN_REDIRECT_URL = '/'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases

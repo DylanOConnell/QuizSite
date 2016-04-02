@@ -1,6 +1,7 @@
 from django.http import HttpResponse 
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import loader
+from django.contrib.auth import authenticate
 from .forms import AddQuestionForm, AddAnswerForm
 from quizcreator.models import Quiz, Question, Answer, QuestionOrdering
 from django.db.models import Max
@@ -8,6 +9,39 @@ from django.db.models import Max
 # This is our basic homepage. For now, provides links to other pages.
 def home(request):
 	return render(request,'quizsite/home.html')
+
+# Login a user
+#def login(request):
+#	if(request.method == 'POST'):
+#		if 'user_id' in request.sessions.keys():
+#			user = User.objects.get(id = request.session['user_id'])
+#		elif ('uname' in request.POST.keys()) and ('password' in request.POST.keys()):
+#			user = authenticate(username=request.POST['uname'], password = request.POST['password'])
+#			if (user is not None) and user.is_active:
+#				request.session['user_id']=user.id
+#			else:
+#				return render(request, 'quizsite/login.html',{'error': "Incorrect Credentials"})
+#		else:
+#			return render(request,'quizsite/login.html',{'error': "Incorrect Credentials"})
+#	else:
+#		return render(request, 'quizsite/login.html')
+#	return render(request, 'quizsite/quizzes.html')
+
+
+	#u = Member.objects.get(username=request.POST['username'])
+	#if u.password == request.POST['password']:
+	#	request.session['member_id'] = m.id
+	#	return HttpResponse("Log in successful.")
+	#else:
+	#	return HttpResponse("Incorrect username or password")
+
+# Logout a user
+#def logout(request):
+#    try:
+#        del request.session['member_id']
+#    except KeyError:
+#        pass
+#    return HttpResponse("Logout successful.")
 
 # View for the overall list of quizzes. Each quiz id is shown, and provides a link to the first question of that quiz
 def quizzes(request):
@@ -77,6 +111,7 @@ def addquestion(request):
 			# Then, we display another Form to take in new information
 			questionform = AddQuestionForm()
 			answerform = AddAnswerForm()
+	# Tell the user (using the django functionality) telling the user why their form was not valid.
 	# if post information not provided, simply display both forms.
 	else:
 		questionform = AddQuestionForm()
