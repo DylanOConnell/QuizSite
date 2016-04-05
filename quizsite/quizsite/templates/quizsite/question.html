@@ -8,13 +8,14 @@
 <h1>Question {{question.id}}:</h1>
 <p></p>
 
-  <form>
+  <form action="{% url 'quizzes:submitanswer' quiz.id question.id %}" method="post">
   <fieldset>
      <legend>{{question.text}}</legend>
-     {% if question  %}
+     {% if question %}
      <ul>
+	{% csrf_token %}
         {% for answer in answer_list  %}
-            <input type="radio" name="answer" id = "answer{{forloop.counter }}" value= "{{ answer.id}}"
+            <input type="checkbox" name="answer" id = "answer{{forloop.counter }}" value= "{{ answer.id}}" />
             <label for="answer{{ forloop.counter }}">{{ answer.text}}</label><br />
         {% endfor %}
      </ul>

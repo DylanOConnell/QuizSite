@@ -6,6 +6,8 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$',views.home, name = "home"),
 #    url(r'^login/$',views.login, name = "login"),
+# More info on what the below includes is described here
+# https://docs.djangoproject.com/en/1.8/topics/auth/default/#module-django.contrib.auth.views
     url(r'', include('django.contrib.auth.urls')),
 #    url(r'^login/$', views.login, name='login'),
     url(r'^quizzes/', include('quizcreator.urls', namespace = "quizzes", app_name = 'quizcreator')),

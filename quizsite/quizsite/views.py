@@ -2,13 +2,15 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import loader
 from django.contrib.auth import authenticate
-from .forms import AddQuestionForm, AddAnswerForm
-from quizcreator.models import Quiz, Question, Answer, QuestionOrdering
+from .forms import AddQuestionForm, AddAnswerForm, QuizResultForm, AnswerResultForm
+from quizcreator.models import Quiz, Question, Answer, QuestionOrdering, QuizResult, AnswerResult
 from django.db.models import Max
 
 # This is our basic homepage. For now, provides links to other pages.
 def home(request):
 	return render(request,'quizsite/home.html')
+# Use login
+# use is_authenticate
 
 # Login a user
 #def login(request):
@@ -132,10 +134,23 @@ def addanswer(request):
 	else:
 		return redirect('/quizzes/addquestion')
 
+
+def submitanswer(request, quiz_id, question_id):
+	if request.method =="POST":
+		selected_answers = request.POST.getlist('answer')
+		for answer in Answer.objects.filter(question__id = question_id):
+			newanswerresult = AnswerResult(question = 
+		for answer in selected_answers:
+				
+		return HttpResponse(selected_answers)
+	else:
+		return redirect('/quizzes')
+		
+
 #def createquiz(request):
 #	template = loader.get_template('quizsite/createquiz.html')
 #	context = {
 #		'user' : user,
 #	}
 #	return HttpResponse(template.render(context,request))
-#
+# 

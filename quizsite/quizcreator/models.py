@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Quiz(models.Model):
     name = models.CharField(max_length=200,null=True)
@@ -31,20 +32,21 @@ class Answer(models.Model):
     correct_type = models.CharField(max_length=6,choices=answer_choices, default = fully_wrong)   
     question = models.ForeignKey(Question,null=True,blank=True) # For now, I will allow answers that don't have associated questions to be stored for future use! 
 # This is outdated and unused. Will soon be replaced by a real user system.
-class User(models.Model):
+#class User(models.Model):
     # users can be either reg_users or admins. reg_users can take tests, admins can see everyone's results
-    admin = 'adm'
-    reg_user = 'usr'
-    user_choices = ( (admin, 'Admin'), (reg_user, 'User'))
-    user_type = models.CharField(max_length=3,choices = user_choices,default = reg_user)
+#    admin = 'adm'
+#    reg_user = 'usr'
+#    user_choices = ( (admin, 'Admin'), (reg_user, 'User'))
+#    user_type = models.CharField(max_length=3,choices = user_choices,default = reg_user)
+
 
 # The results system has not been implemented. These are placeholder models.
-class QuizResults(models.Model):
+class QuizResult(models.Model):
     score = models.IntegerField(default=0)
     user = models.ForeignKey(User,null=True)
     quiz = models.ForeignKey(Quiz)
 
-class AnswerResults(models.Model):
+class AnswerResult(models.Model):
     quiz = models.ForeignKey(Quiz)
     question = models.ForeignKey(Question)
     answer = models.ForeignKey(Answer)
