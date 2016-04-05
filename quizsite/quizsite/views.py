@@ -1,10 +1,13 @@
-from django.http import HttpResponse 
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import loader
 from django.contrib.auth import authenticate
+from django.contrib.auth.forms import UserCreationForm
 from .forms import AddQuestionForm, AddAnswerForm, QuizResultForm, AnswerResultForm
 from quizcreator.models import Quiz, Question, Answer, QuestionOrdering, QuizResult, AnswerResult
 from django.db.models import Max
+from django.contrib.auth import login, logout
+
 
 # This is our basic homepage. For now, provides links to other pages.
 def home(request):
@@ -12,35 +15,19 @@ def home(request):
 # Use login
 # use is_authenticate
 
-# Login a user
-#def login(request):
-#	if(request.method == 'POST'):
-#		if 'user_id' in request.sessions.keys():
-#			user = User.objects.get(id = request.session['user_id'])
-#		elif ('uname' in request.POST.keys()) and ('password' in request.POST.keys()):
-#			user = authenticate(username=request.POST['uname'], password = request.POST['password'])
-#			if (user is not None) and user.is_active:
-#				request.session['user_id']=user.id
-#			else:
-#				return render(request, 'quizsite/login.html',{'error': "Incorrect Credentials"})
-#		else:
-#			return render(request,'quizsite/login.html',{'error': "Incorrect Credentials"})
-#	else:
-#		return render(request, 'quizsite/login.html')
-#	return render(request, 'quizsite/quizzes.html')
-
-
-	#u = Member.objects.get(username=request.POST['username'])
-	#if u.password == request.POST['password']:
-	#	request.session['member_id'] = m.id
-	#	return HttpResponse("Log in successful.")
-	#else:
-	#	return HttpResponse("Incorrect username or password")
 
 # Logout a user
-#def logout(request):
+def login_view(request):
+#	return render(request, 'registration/login.html')
+	return redirect('/login')
+
+# Logout a user
+def logout_view(request):
+	logout(request)
+	return redirect('/')
+
 #    try:
-#        del request.session['member_id']
+#       del request.session['member_id']
 #    except KeyError:
 #        pass
 #    return HttpResponse("Logout successful.")
@@ -138,13 +125,25 @@ def addanswer(request):
 def submitanswer(request, quiz_id, question_id):
 	if request.method =="POST":
 		selected_answers = request.POST.getlist('answer')
-		for answer in Answer.objects.filter(question__id = question_id):
-			newanswerresult = AnswerResult(question = 
-		for answer in selected_answers:
+#		for answer in Answer.objects.filter(question__id = question_id):
+#			newanswerresult = AnswerResult(question =  
+#		for answer in selected_answers:
 				
 		return HttpResponse(selected_answers)
 	else:
 		return redirect('/quizzes')
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            return HttpResponseRedirect('/')
+    else:
+        form = UserCreationForm()
+    context = {'form': form}
+    return render(request, 'registration/register.html', context)
+
 		
 
 #def createquiz(request):

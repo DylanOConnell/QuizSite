@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 
+{% extends "base.html" %}
 <html>
+{% block content %}
     <head>
         <base href="{% url 'quizzes:addquestion' %}" />
         <title>"Add Question Forms"</title>
@@ -22,6 +24,7 @@
        </form>
 
     </body>
+{% endblock %}
 </html>
 
 

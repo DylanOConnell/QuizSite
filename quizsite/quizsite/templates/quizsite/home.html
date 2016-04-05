@@ -1,5 +1,7 @@
 <!DOCTYPE html>
+{% extends "base.html" %}
 <html>
+{% block content %}
 <head>
 <title>Home</title>
 </head>
@@ -12,8 +14,18 @@
       <li><a href="{% url 'quizzes:quizzes' %}"> List of Quizzes</a></li>
       <br />
       <li><a href="{% url 'quizzes:addquestion' %}"> Add a Question Here</a></li>
+      <br />
+      <li><a href="{% url 'account:register' %}"> Register an Account</a></li>
+      <br />
+      <li><a href="{% url 'django.contrib.auth.views.login' %}"> Login</a></li>
+      <br />
+      <li><a href="{% url 'account:logout' %}"> Logout</a></li>
+      <br />
 
 </body>
+
+{% endblock %}
+
 </html>
 
 

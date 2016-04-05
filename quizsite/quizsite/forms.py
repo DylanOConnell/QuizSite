@@ -27,6 +27,7 @@ class QuizResultForm(ModelForm):
 	class Meta:
 		model = QuizResult
 		fields = ['score','user','quiz']
+
 # custom validation for a form: only valid inputs, even with hidden field
 class AnswerResultForm(ModelForm):
 	class Meta:
