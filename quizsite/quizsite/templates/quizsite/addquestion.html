@@ -8,21 +8,20 @@
         <title>"Add Question Forms"</title>
     </head>
     <body>
-       <form action="{% url 'quizzes:addquestion' %}" method="post">
+        <form action="{% url 'quizzes:addquestion' %}" method="post">
             {% csrf_token %}
             <ol>
             {{ questionform.as_ul }}
             </ol>
             <input type="submit" value="Add Question" />
-       </form>
-       <form action="{% url 'quizzes:addanswer' %}" method="post">
+        </form>
+        <form action="{% url 'quizzes:addanswer' %}" method="post">
             {% csrf_token %}
             <ol>
             {{ answerform.as_ul }}
             </ol>
             <input type="submit" value="Add Answer" />
-       </form>
-
+        </form>
     </body>
 {% endblock %}
 </html>

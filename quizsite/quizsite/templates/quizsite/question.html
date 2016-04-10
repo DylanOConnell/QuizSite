@@ -9,40 +9,37 @@
 
 <h1>Question {{question.id}}:</h1>
 <p></p>
+<form action="{% url 'quizzes:submitanswer' quiz.id question.id %}" method="post">
+    <fieldset>
+        <legend>{{question.text}}</legend>
+        {% if question %}
+            <ul>
+	        {% csrf_token %}
+            {% for answer in answer_list  %}
+                <input type="checkbox" name="answer" id = "answer{{forloop.counter }}" value= "{{ answer.id}}" />
+                <label for="answer{{ forloop.counter }}">{{ answer.text}}</label><br />
+            {% endfor %}
+            </ul>
+            <input type="submit" value="Submit" />
+        {% else %}
+            <p>No valid question here.</p>
+        {% endif %}
+    </fieldset><br />
+</form>
 
-  <form action="{% url 'quizzes:submitanswer' quiz.id question.id %}" method="post">
-  <fieldset>
-     <legend>{{question.text}}</legend>
-     {% if question %}
-     <ul>
-	{% csrf_token %}
-        {% for answer in answer_list  %}
-            <input type="checkbox" name="answer" id = "answer{{forloop.counter }}" value= "{{ answer.id}}" />
-            <label for="answer{{ forloop.counter }}">{{ answer.text}}</label><br />
-        {% endfor %}
-     </ul>
-     <input type="submit" value="Submit" />
-     {% else %}
-        <p>No valid question here.</p>
-     {% endif %}
-   </fieldset><br />
-   </form>
-
-   {% if prev_question %}
-      <li><a href="{% url 'quizzes:question' quiz.id prev_question.id %}">Previous: Question {{ prev_question_number}}</a></li>
-   {% else %}
-      <p> First question in the quiz. </p>
-   {% endif %}
-
-   <br />
-   {% if next_question %}
-      <li><a href="{% url 'quizzes:question' quiz.id next_question.id %}">Next: Question {{ next_question_number}}</a></li>
-   {% else %}
-       <p> Final question in the quiz. </p>
-   {% endif %}
+{% if prev_question %}
+    <li><a href="{% url 'quizzes:question' quiz.id prev_question.id %}">Previous: Question {{ prev_question_number}}</a></li>
+{% else %}
+    <p> First question in the quiz. </p>
+{% endif %}
+<br />
+{% if next_question %}
+    <li><a href="{% url 'quizzes:question' quiz.id next_question.id %}">Next: Question {{ next_question_number}}</a></li>
+{% else %}
+    <p> Final question in the quiz. </p>
+{% endif %}
 
 </body>
-
 {% endblock %}
 </html>
 
