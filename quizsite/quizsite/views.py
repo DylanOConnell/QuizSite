@@ -15,8 +15,6 @@ def home(request):
 # Use login
 # use is_authenticate
 
-
-# Logout a user
 def login_view(request):
 #   return render(request, 'registration/login.html')
     return redirect('/login')
@@ -94,7 +92,10 @@ def addquestion(request):
         if questionform.is_valid():
             newquestion = Question(text=questionform.cleaned_data['text']) 
             newquestion.save()
-            nextnumber = QuestionOrdering.objects.filter(quiz = questionform.cleaned_data['quiz']).aggregate(Max('ordering'))['ordering__max'] + 1
+            if QuestionOrdering.objects.filter(quiz = questionform.cleaned_data['quiz']).aggregate(Max('ordering'))['ordering__max']:
+                nextnumber = QuestionOrdering.objects.filter(quiz = questionform.cleaned_data['quiz']).aggregate(Max('ordering'))['ordering__max'] + 1
+            else:
+                nextnumber = 0
             qordering = QuestionOrdering(quiz = questionform.cleaned_data['quiz'], question = newquestion, ordering = nextnumber )
             qordering.save()
             # Then, we display another Form to take in new information

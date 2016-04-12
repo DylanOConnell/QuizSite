@@ -1,7 +1,7 @@
 {% if user.is_authenticated %}
-    <p>Welcome, {{ user.username }}  <a href="{% url 'account:logout' %}">[logout]</a></p>
+    <p>Welcome, {{ user.username }} <a href="{% url 'home' %}">[Home]</a> <a href="{% url 'account:logout' %}">[logout]</a></p>
 {% else %}
-    <p>Welcome, Guest <a href="{% url 'account:login' %}">[login]</a></p>
+    <p>Welcome, Guest <a href="{% url 'home' %}">[Home]</a> <a href="{% url 'account:login' %}">[login]</a></p>
 {% endif %}
 
 {% block content %}
