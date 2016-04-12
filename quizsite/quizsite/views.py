@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.template import loader
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
-from .forms import AddQuestionForm, AddAnswerForm, QuizResultForm, AnswerResultForm
+from .forms import AddQuestionForm, AddAnswerForm, AddQuizForm, QuizResultForm, AnswerResultForm
 from quizcreator.models import Quiz, Question, Answer, QuestionOrdering, QuizResult, AnswerResult
 from django.db.models import Max
 from django.contrib.auth import login, logout
@@ -100,14 +100,17 @@ def addquestion(request):
             # Then, we display another Form to take in new information
             questionform = AddQuestionForm()
             answerform = AddAnswerForm()
+            quizform = AddQuizForm()
     # Tell the user (using the django functionality) telling the user why their form was not valid.
     # if post information not provided, simply display both forms.
     else:
         questionform = AddQuestionForm()
         answerform = AddAnswerForm()
+        quizform = AddQuizForm()
     context = {
         'questionform':questionform,
         'answerform':answerform,
+        'quizform':quizform,
     }
     return render(request,'quizsite/addquestion.html',context)
 
@@ -121,6 +124,16 @@ def addanswer(request):
     else:
         return redirect('/quizzes/addquestion')
 
+def addquiz(request):
+    if request.method=="POST":
+        quizform = AddQuizForm(data=request.POST)
+        if quizform.is_valid():
+            quizform.save()
+            return redirect('/quizzes/addquestion')
+    else:
+        return redirect('/quizzes/addquestion')
+
+
 
 def submitanswer(request, quiz_id, question_id):
     if request.method =="POST":
@@ -128,7 +141,6 @@ def submitanswer(request, quiz_id, question_id):
 #       for answer in Answer.objects.filter(question__id = question_id):
 #           newanswerresult = AnswerResult(question =  
 #       for answer in selected_answers:
-                
         return HttpResponse(selected_answers)
     else:
         return redirect('/quizzes')

@@ -19,6 +19,11 @@ class AddAnswerForm(ModelForm):
         model = Answer
         fields = ['text', 'correct_type', 'question'] 
 
+class AddQuizForm(ModelForm):
+    class Meta:
+        model = Quiz
+        fields = ['name']
+
 class LoginForm(forms.Form):
     username = forms.CharField(label="User")
     password = forms.CharField(widget=forms.PasswordInput, label="Password")

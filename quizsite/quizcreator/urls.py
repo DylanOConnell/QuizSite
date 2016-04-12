@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^(?P<quiz_id>[0-9]+)/(?P<question_id>[0-9]+)/$', views.question, name='question'),
     url(r'^addquestion$', views.addquestion, name='addquestion'),
     url(r'^addanswer$', views.addanswer, name='addanswer'),
+    url(r'^addquiz$', views.addquiz, name='addquiz'),
     url(r'^(?P<quiz_id>[0-9]+)/(?P<question_id>[0-9]+)/submitanswer$', views.submitanswer, name='submitanswer'),
 ]
 
