@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+{% extends "base.html" %}
+<html>
+{% block content %}
+    <head>
+        <base href="{% url 'quizzes:addquestion' %}" />
+        <title>"Add Question Forms"</title>
+    </head>
+    <body>
+        <form action="{% url 'quizzes:addquestion' %}" method="post">
+            {% csrf_token %}
+            <ol>
+            {{ questionform.as_ul }}
+            </ol>
+            <input type="submit" value="Add Question" />
+        </form>
+        <form action="{% url 'quizzes:addanswer' %}" method="post">
+            {% csrf_token %}
+            <ol>
+            {{ answerform.as_ul }}
+            </ol>
+            <input type="submit" value="Add Answer" />
+        </form>
+        <form action="{% url 'quizzes:addquiz' %}" method="post">
+            {% csrf_token %}
+            <ol>
+            {{ quizform.as_ul }}
+            </ol>
+            <input type="submit" value="Add Quiz" />
+        </form>
+    </body>
+{% endblock %}
+</html>
+
+

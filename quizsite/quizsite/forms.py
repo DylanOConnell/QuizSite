@@ -24,6 +24,26 @@ class AddQuizForm(ModelForm):
         model = Quiz
         fields = ['name']
 
+#class QuestionForm(forms.Form):
+#    def __init__(self, answers, *args, **kwargs):
+#        self.answers = answers
+#        for answer in answers:
+#            field_name = "answer_%d" % answer.pk
+#            choices 
+
+class AnswerResultForm(ModelForm):
+    #def __init__(self, quiz,question,answer,*args, **kwargs):
+    #    self.fields['quiz'].initial = quiz
+    #    self.fields['question'].initial = quiz
+    #    self.fields['answer'].initial = quiz
+    #    super(AddAnswerResultForm, self).__init__(*args, **kwargs)
+    class Meta:
+        model = AnswerResult
+        fields = ['selected']
+#        exclude = ['quiz','question','answer']
+        widgets = {'quiz': forms.HiddenInput(), 'question': forms.HiddenInput(), 'answer': forms.HiddenInput()}
+
+
 class LoginForm(forms.Form):
     username = forms.CharField(label="User")
     password = forms.CharField(widget=forms.PasswordInput, label="Password")
@@ -34,7 +54,7 @@ class QuizResultForm(ModelForm):
         fields = ['score','user','quiz']
 
 # custom validation for a form: only valid inputs, even with hidden field
-class AnswerResultForm(ModelForm):
-    class Meta:
-        model = AnswerResult
-        fields = ['quiz','question','answer','selected']
+#class AnswerResultForm(ModelForm):
+#   class Meta:
+#        model = AnswerResult
+#        fields = ['quiz','question','answer','selected']

@@ -39,6 +39,25 @@
     <p> Final question in the quiz. </p>
 {% endif %}
 
+<form method="post" action="{% url 'quizzes:submitanswer' quiz.id question.id %}">
+{% csrf_token %}
+{{ formset.management_form }}
+    <table>
+        {% for form in formset %}
+            {{ form }}
+        {% endfor %}
+    </table>
+    <input type="submit" value="Submit Answer" />
+</form>
+
+<form action="{% url 'quizzes:submitanswer' quiz.id question.id %}" method="post">
+    {% csrf_token %}
+        <ol>
+            {{ answerresulttest.as_ul }}
+        </ol>
+    <input type="submit" value="Submit Answer" />
+</form>
+
 </body>
 {% endblock %}
 </html>

@@ -4,9 +4,13 @@ from django.template import loader
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
 from .forms import AddQuestionForm, AddAnswerForm, AddQuizForm, QuizResultForm, AnswerResultForm
+from django.forms import modelformset_factory
 from quizcreator.models import Quiz, Question, Answer, QuestionOrdering, QuizResult, AnswerResult
 from django.db.models import Max
 from django.contrib.auth import login, logout
+
+
+# FormSets
 
 
 # This is our basic homepage. For now, provides links to other pages.
@@ -46,6 +50,11 @@ def question(request, quiz_id, question_id):
     question = get_object_or_404( Question.objects.filter( pk = question_id, quiz__id = quiz_id )) 
     # We use a filter to find all answers that have the requisite question_id
     answer_list = Answer.objects.filter(question__id = question_id)
+    answerresult_formset = modelformset_factory(AnswerResult,AnswerResultForm)#, extra=2)
+    testanswer = answer_list.first()
+    answerresulttest = AnswerResultForm()
+    formset = answerresult_formset(initial=[
+        {'quiz': quiz, 'question': question, 'answer': testanswer}])
     # We find the next and previous question using questionordering, if they exist. It also grabs the number, for display purposes
     try:
         next_question = Question.objects.get(quiz__id = quiz.id, questionordering__ordering =  ( question.questionordering_set.get(quiz_id = quiz.id).ordering+1))
@@ -68,6 +77,9 @@ def question(request, quiz_id, question_id):
         'next_question_number' : next_question_number,
         'prev_question' : prev_question,
         'prev_question_number' : prev_question_number,
+        'answerresult_formset' : answerresult_formset,
+        'answerresulttest' : answerresulttest,
+        'formset' : formset,
     }
     return render(request,'quizsite/question.html',context)
 
@@ -138,13 +150,20 @@ def addquiz(request):
 
 def submitanswer(request, quiz_id, question_id):
     if request.method =="POST":
-        selected_answers = request.POST.getlist('answer')
+        answerresult_formset = modelformset_factory(AnswerResult,AnswerResultForm)#, extra=2)
+#        answerresult_formset = modelformset_factory(AnswerResultForm)
+        formset = answerresult_formset(request.POST)
+        if formset.is_valid():
+            formset.save()
+            return redirect('/quizzes')
+
+#        selected_answers = request.POST.getlist('answer')
 #       for answer in Answer.objects.filter(question__id = question_id):
 #           newanswerresult = AnswerResult(question =  
 #       for answer in selected_answers:
-        return HttpResponse(selected_answers)
+#        return HttpResponse(selected_answers)
     else:
-        return redirect('/quizzes')
+        return redirect('/')
 
 def register(request):
     if request.method == 'POST':
