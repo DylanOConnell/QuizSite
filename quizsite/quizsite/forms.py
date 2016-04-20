@@ -39,10 +39,8 @@ class AnswerResultForm(ModelForm):
     #    super(AddAnswerResultForm, self).__init__(*args, **kwargs)
     class Meta:
         model = AnswerResult
-        fields = ['selected']
-#        exclude = ['quiz','question','answer']
+        fields = ['quiz', 'question','answer','selected']
         widgets = {'quiz': forms.HiddenInput(), 'question': forms.HiddenInput(), 'answer': forms.HiddenInput()}
-
 
 class LoginForm(forms.Form):
     username = forms.CharField(label="User")
