@@ -20,19 +20,12 @@ def home(request):
 # use is_authenticate
 
 def login_view(request):
-#   return render(request, 'registration/login.html')
     return redirect('/login')
 
 # Logout a user
 def logout_view(request):
     logout(request)
     return redirect('/')
-
-#    try:
-#       del request.session['member_id']
-#    except KeyError:
-#        pass
-#    return HttpResponse("Logout successful.")
 
 # View for the overall list of quizzes. Each quiz id is shown, and provides a link to the first question of that quiz
 def quizzes(request):
@@ -51,8 +44,6 @@ def question(request, quiz_id, question_id):
     # We use a filter to find all answers that have the requisite question_id
     answer_list = Answer.objects.filter(question__id = question_id)
     answerresult_formset = modelformset_factory(AnswerResult,AnswerResultForm,extra=len(answer_list))#, extra=2)
-#    testanswer = answer_list.first()
-#    answerresulttest = AnswerResultForm()
     formset = answerresult_formset(queryset=AnswerResult.objects.none(),initial=[
         {'quiz': quiz, 'question': question, 'answer': answer} for answer in answer_list])
     # We find the next and previous question using questionordering, if they exist. It also grabs the number, for display purposes
@@ -77,8 +68,6 @@ def question(request, quiz_id, question_id):
         'next_question_number' : next_question_number,
         'prev_question' : prev_question,
         'prev_question_number' : prev_question_number,
-#        'answerresult_formset' : answerresult_formset,
-#        'answerresulttest' : answerresulttest,
         'formset' : formset,
     }
     return render(request,'quizsite/question.html',context)
@@ -139,12 +128,15 @@ def addquiz(request):
 def submitanswer(request, quiz_id, question_id):
     if request.method =="POST":
         answerresult_formset = modelformset_factory(AnswerResult,AnswerResultForm,extra=1)#, extra=2)
-#        answerresult_formset = modelformset_factory(AnswerResultForm)
-        formset = answerresult_formset(request.POST)#,initial=[
-#                    {'quiz': quiz, 'question': question, 'answer': testanswer}])
+        formset = answerresult_formset(request.POST)
         if formset.is_valid():
-            formset.save()
+            if 
+            new_formset = formset.save(commit=False)
+            for form in new_formset:
+                form.user = request.user
+                form.save()
             return redirect('/quizzes')
+        return HttpResponse(formset.errors)
 
 #        selected_answers = request.POST.getlist('answer')
 #       for answer in Answer.objects.filter(question__id = question_id):
@@ -164,8 +156,6 @@ def register(request):
         form = UserCreationForm()
     context = {'form': form}
     return render(request, 'registration/register.html', context)
-
-        
 
 #def createquiz(request):
 #   template = loader.get_template('quizsite/createquiz.html')

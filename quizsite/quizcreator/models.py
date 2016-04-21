@@ -46,12 +46,13 @@ class Answer(models.Model):
 # The results system has not been implemented. These are placeholder models.
 class QuizResult(models.Model):
     score = models.IntegerField(default=0)
-    user = models.ForeignKey(User,null=True)
+    user = models.ForeignKey(User,null=True,blank=True)
     quiz = models.ForeignKey(Quiz)
 
 class AnswerResult(models.Model):
     quiz = models.ForeignKey(Quiz)
     question = models.ForeignKey(Question)
     answer = models.ForeignKey(Answer)
+    user = models.ForeignKey(User,null=True,blank=True)
     selected = models.BooleanField() # CASEY: Clever. :)
 

@@ -32,15 +32,10 @@ class AddQuizForm(ModelForm):
 #            choices 
 
 class AnswerResultForm(ModelForm):
-    #def __init__(self, quiz,question,answer,*args, **kwargs):
-    #    self.fields['quiz'].initial = quiz
-    #    self.fields['question'].initial = quiz
-    #    self.fields['answer'].initial = quiz
-    #    super(AddAnswerResultForm, self).__init__(*args, **kwargs)
     class Meta:
         model = AnswerResult
-        fields = ['quiz', 'question','answer','selected']
-        widgets = {'quiz': forms.HiddenInput(), 'question': forms.HiddenInput(), 'answer': forms.HiddenInput()}
+        fields = ['quiz', 'question','answer','user','selected']
+        widgets = {'quiz': forms.HiddenInput(), 'question': forms.HiddenInput(), 'answer': forms.HiddenInput(),'user':forms.HiddenInput()}
 
 class LoginForm(forms.Form):
     username = forms.CharField(label="User")
