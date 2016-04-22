@@ -139,14 +139,20 @@ def submitanswer(request, quiz_id, question_id):
                 if form.quiz.id == long(quiz_id) and form.question.id == long(question_id):
                     try:
                         form.user = request.user
+                        #if 
                         form.save()
                     except:
-                        return HttpResponse("You must be logged in to submit an answer")
+                        context = {'error' : "You must be logged in to submit an answer."}
+                        return render(request, 'quizsite/error.html', context)# HttpResponse("You must be logged in to submit an answer")
                         
                 else:
-                    return HttpResponse("Invalid Answer Submission")#str(form.quiz.id) + " "  + str(form.question.id) + " " +  str(quiz_id) + " " +  str(question_id))
+                    context = {'error' : "Invalid answer submission."}
+                    return render(request, 'quizsite/error.html', context)
+                    #return HttpResponse("Invalid Answer Submission")#str(form.quiz.id) + " "  + str(form.question.id) + " " +  str(quiz_id) + " " +  str(question_id))
             return redirect('/quizzes/{}/{}'.format(str(quiz_id),str(question_id)))
-        return HttpResponse(formset.errors)
+        #return HttpResponse(formset.errors)
+        context = {'error' : formset.errors}
+        return render(request, 'quizsite/error.html', context)
     else:
         return redirect('/')
 

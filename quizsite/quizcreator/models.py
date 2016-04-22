@@ -33,6 +33,8 @@ class Answer(models.Model):
     )
     correct_type = models.CharField(max_length=6,choices=answer_choices, default = fully_wrong)   
     question = models.ForeignKey(Question,null=True,blank=True) # For now, I will allow answers that don't have associated questions to be stored for future use! 
+    def __str__(self):
+        return self.text
 
 # The results system has not been implemented. These are placeholder models.
 class QuizResult(models.Model):
@@ -45,5 +47,5 @@ class AnswerResult(models.Model):
     question = models.ForeignKey(Question)
     answer = models.ForeignKey(Answer)
     user = models.ForeignKey(User,null=True,blank=True)
-    selected = models.BooleanField() # CASEY: Clever. :)
+    selected = models.BooleanField()#verbose_name = str(self.answer) # CASEY: Clever. :)
 
