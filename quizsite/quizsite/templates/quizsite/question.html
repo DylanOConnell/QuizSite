@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<h1>Question {{question.id}}:</h1>
+<h1>Question #{{curr_question_number}}:</h1>
 <p></p>
 <form action="{% url 'quizzes:submitanswer' quiz.id question.id %}" method="post">
     <fieldset>
@@ -43,8 +43,13 @@
 {% csrf_token %}
 {{ formset.management_form }}
     <table>
-        {% for form in formset %}
-            {{ form }}
+        {% for item in formset_answers %}
+           <!-- {% for field in form %}
+                {{field.field.initial}}
+            {% endfor %} -->
+            <ul>
+                {{ item.1.text }}{{ item.0 }}
+            </ul>
         {% endfor %}
     </table>
     <input type="submit" value="Submit Answer" />

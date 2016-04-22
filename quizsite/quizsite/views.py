@@ -46,6 +46,7 @@ def question(request, quiz_id, question_id):
     answerresult_formset = modelformset_factory(AnswerResult,AnswerResultForm,extra=len(answer_list))#, extra=2)
     formset = answerresult_formset(queryset=AnswerResult.objects.none(),initial=[
         {'quiz': quiz, 'question': question, 'answer': answer} for answer in answer_list])
+    formset_answers = zip(formset, answer_list)
     # We find the next and previous question using questionordering, if they exist. It also grabs the number, for display purposes
     try:
         next_question = Question.objects.get(quiz__id = quiz.id, questionordering__ordering =  ( question.questionordering_set.get(quiz_id = quiz.id).ordering+1))
@@ -59,7 +60,10 @@ def question(request, quiz_id, question_id):
     except:
         prev_question = None
         prev_question_number = None
-
+    try:
+       curr_question_number = question.questionordering_set.get(quiz_id = quiz.id).ordering
+    except:
+        curr_question_number = None
     context = {
         'quiz' : quiz,
         'question' : question,
@@ -68,7 +72,9 @@ def question(request, quiz_id, question_id):
         'next_question_number' : next_question_number,
         'prev_question' : prev_question,
         'prev_question_number' : prev_question_number,
+        'curr_question_number' : curr_question_number,
         'formset' : formset,
+        'formset_answers': formset_answers,
     }
     return render(request,'quizsite/question.html',context)
 
@@ -123,26 +129,24 @@ def addquiz(request):
     else:
         return redirect('/quizzes/addquestion')
 
-
-
 def submitanswer(request, quiz_id, question_id):
     if request.method =="POST":
         answerresult_formset = modelformset_factory(AnswerResult,AnswerResultForm,extra=1)#, extra=2)
         formset = answerresult_formset(request.POST)
         if formset.is_valid():
-            if 
             new_formset = formset.save(commit=False)
             for form in new_formset:
-                form.user = request.user
-                form.save()
-            return redirect('/quizzes')
+                if form.quiz.id == long(quiz_id) and form.question.id == long(question_id):
+                    try:
+                        form.user = request.user
+                        form.save()
+                    except:
+                        return HttpResponse("You must be logged in to submit an answer")
+                        
+                else:
+                    return HttpResponse("Invalid Answer Submission")#str(form.quiz.id) + " "  + str(form.question.id) + " " +  str(quiz_id) + " " +  str(question_id))
+            return redirect('/quizzes/{}/{}'.format(str(quiz_id),str(question_id)))
         return HttpResponse(formset.errors)
-
-#        selected_answers = request.POST.getlist('answer')
-#       for answer in Answer.objects.filter(question__id = question_id):
-#           newanswerresult = AnswerResult(question =  
-#       for answer in selected_answers:
-#        return HttpResponse(selected_answers)
     else:
         return redirect('/')
 
@@ -156,11 +160,3 @@ def register(request):
         form = UserCreationForm()
     context = {'form': form}
     return render(request, 'registration/register.html', context)
-
-#def createquiz(request):
-#   template = loader.get_template('quizsite/createquiz.html')
-#   context = {
-#       'user' : user,
-#   }
-#   return HttpResponse(template.render(context,request))
-# 

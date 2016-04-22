@@ -32,6 +32,9 @@ class AddQuizForm(ModelForm):
 #            choices 
 
 class AnswerResultForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(AnswerResultForm, self).__init__(*args, **kwargs)
+#        self.fields['selected'].label = str(self.fields['answer']) 
     class Meta:
         model = AnswerResult
         fields = ['quiz', 'question','answer','user','selected']
