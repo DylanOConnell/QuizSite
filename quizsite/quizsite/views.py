@@ -50,9 +50,23 @@ def quizzes(request):
 
 def beginquiz(request,quiz_id):
     if request.method == "POST":
-        quiz = get_object_or_404(Quiz, pk = quiz_id)
-#        first_question = quiz.questions.all().first()
-        return redirect('/quizzes/{}/{}'.format(quiz_id,quiz.questions.all().first().id))
+        if request.user.is_authenticated():
+            quiz = get_object_or_404(Quiz, pk = quiz_id)
+            quizresultform = QuizResultForm(request.POST)
+            if quizresultform.is_valid():
+                if QuizResult.objects.filter(quiz = quiz, user = request.user):
+                    context = {'error' : "You've already begun that quiz."}
+                    return render(request, 'quizsite/error.html', context)
+                else:
+                    quizresultform.save()
+                    return redirect('/quizzes/{}/{}'.format(quiz_id,quiz.questions.all().first().id))
+            else:
+                context = {'error' : "Invalid Submission."}
+                return render(request, 'quizsite/error.html', context)
+        else:
+            context = {'error' : "You must be logged in to begin a quiz."}
+            return render(request, 'quizsite/error.html', context)
+
     else:
         quiz = get_object_or_404(Quiz, pk = quiz_id)
         if not request.user.is_authenticated():
@@ -66,6 +80,42 @@ def beginquiz(request,quiz_id):
                 'quizresultform' : quizresultform,
                 }
         return render(request, 'quizsite/beginquiz.html',context)
+
+def finishquiz(request, quiz_id):
+    if request.user.is_authenticated():
+        quiz = get_object_or_404(Quiz, pk=quiz_id)
+        if QuizResult.objects.filter(quiz = quiz, user = request.user):
+            if QuizResult.objects.filter(quiz = quiz, user = request.user).first().finished:
+                context = {'error' : "You have already completed this quiz."}
+                return render(request, 'quizsite/error.html', context)
+            else:
+                quizresult = QuizResult.objects.filter(quiz = quiz, user = request.user).first()
+                quizresult.finished = True
+                quizresult.save()
+                return redirect('/')
+        else:
+            context = {'error' : "You have not yet begun this quiz."}
+            return render(request, 'quizsite/error.html', context)
+    else:
+        context = {'error' : "Must be logged in to end a quiz."}
+        return render(request, 'quizsite/error.html', context)
+
+def quizresults(request, quiz_id):
+    if request.user.is_authentticated():
+        if QuizResult.objects.filter(quiz.id = quiz_id, user = request.user):
+            if QuizResult.objects.filter(quiz.id = quiz_id, user = request.user).first().finished:
+                context = {'error' : "This quiz is already finished."}
+                return render(request, 'quizsite/error.html', context)
+            else:
+        else:
+            context = {'error' : "This quiz has not been begun."}
+            return render(request, 'quizsite/error.html', context)
+
+
+    else:
+        context = {'error' : "Must be logged in to see quiz results."}
+        return render(request, 'quizsite/error.html', context)
+
 
 # view for viewing a question. Needs both the associated quiz and question id
 def question(request, quiz_id, question_id):

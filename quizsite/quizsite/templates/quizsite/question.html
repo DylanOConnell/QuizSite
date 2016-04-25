@@ -3,7 +3,7 @@
 <html>
 {% block content %}
 <head>
-<title>Quiz {{quiz.id}}</title>
+<title> {{quiz}} </title>
 </head>
 <body>
 
@@ -30,13 +30,14 @@
 {% if prev_question %}
     <li><a href="{% url 'quizzes:question' quiz.id prev_question.id %}">Previous: Question {{ prev_question_number}}</a></li>
 {% else %}
-    <p> First question in the quiz. </p>
+    <li> First question in the quiz. </li>
 {% endif %}
 <br />
 {% if next_question %}
     <li><a href="{% url 'quizzes:question' quiz.id next_question.id %}">Next: Question {{ next_question_number}}</a></li>
 {% else %}
-    <p> Final question in the quiz. </p>
+    <li> Final question in the quiz. </li>
+    <a href="{% url 'quizzes:finishquiz' quiz.id %}">Finish the quiz: {{quiz}}</a>
 {% endif %}
 
 <form method="post" action="{% url 'quizzes:submitanswer' quiz.id question.id %}">
