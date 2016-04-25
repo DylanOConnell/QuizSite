@@ -30,10 +30,42 @@ def logout_view(request):
 # View for the overall list of quizzes. Each quiz id is shown, and provides a link to the first question of that quiz
 def quizzes(request):
     quizzes_list = Quiz.objects.all()
+#    try:
+#        curr_user = request.USER
+#        test_list = []
+#        for curr_quiz in quizzes_list:
+#            if QuizResult.objects.filter(user = curr_user, quiz = curr_quiz):
+#
+#    except:
+#        started_quizzes = None
+#    test_list = []
+#    for quiz in quizzes_list:
+#        if QuizResult.objects.filter(
+  #  quizresult_list = QuizResult.objects.all()
     context = {
         'quizzes_list' : quizzes_list,
+ #       'quizresult_list' : quizresult_list,
     }
     return render(request,'quizsite/quizzes.html',context)
+
+def beginquiz(request,quiz_id):
+    if request.method == "POST":
+        quiz = get_object_or_404(Quiz, pk = quiz_id)
+#        first_question = quiz.questions.all().first()
+        return redirect('/quizzes/{}/{}'.format(quiz_id,quiz.questions.all().first().id))
+    else:
+        quiz = get_object_or_404(Quiz, pk = quiz_id)
+        if not request.user.is_authenticated():
+            context = {'error' : "You must be logged in to begin a quiz."}
+            return render(request, 'quizsite/error.html', context)
+        else:
+            user = request.user
+            quizresultform = QuizResultForm(initial = {'quiz' : quiz, 'user' : user, 'finished' : False})
+        context = {        
+                'quiz' : quiz,
+                'quizresultform' : quizresultform,
+                }
+        return render(request, 'quizsite/beginquiz.html',context)
 
 # view for viewing a question. Needs both the associated quiz and question id
 def question(request, quiz_id, question_id):
@@ -73,7 +105,7 @@ def question(request, quiz_id, question_id):
         'prev_question' : prev_question,
         'prev_question_number' : prev_question_number,
         'curr_question_number' : curr_question_number,
-        'formset' : formset,
+#        'formset' : formset,
         'formset_answers': formset_answers,
     }
     return render(request,'quizsite/question.html',context)
@@ -135,12 +167,29 @@ def submitanswer(request, quiz_id, question_id):
         formset = answerresult_formset(request.POST)
         if formset.is_valid():
             new_formset = formset.save(commit=False)
+            # Num correct, num partially wrong, num fully wrong
+            correct_tally = [0,0,0]
             for form in new_formset:
                 if form.quiz.id == long(quiz_id) and form.question.id == long(question_id):
                     try:
                         form.user = request.user
-                        #if 
+                        if AnswerResult.objects.filter(quiz__id = quiz_id, question__id = question_id, user = request.user, answer = form.answer):
+                            try:
+                                AnswerResult.objects.filter(quiz__id = quiz_id, question__id = question_id, user = request.user,answer = form.answer).delete()
+                                #return HttpResponse(form.answer.id)
+                            except:
+                                context = {'error' : "You've already submitted an answer to that question."}
+                                return render(request, 'quizsite/error.html', context)
+
                         form.save()
+                        if form.selected:
+                            if form.answer.correct_type == 'COR':
+                                correct_tally[0] = correct_tally[0] + 1
+                            if form.answer.correct_type == 'PART_W':
+                                correct_tally[1] = correct_tally[1] + 1
+                            if form.answer.correct_type == 'FULL_W':
+                                correct_tally[2] = correct_tally[2] + 1
+                        #return HttpResponse(form.answer.id)
                     except:
                         context = {'error' : "You must be logged in to submit an answer."}
                         return render(request, 'quizsite/error.html', context)# HttpResponse("You must be logged in to submit an answer")
@@ -149,6 +198,7 @@ def submitanswer(request, quiz_id, question_id):
                     context = {'error' : "Invalid answer submission."}
                     return render(request, 'quizsite/error.html', context)
                     #return HttpResponse("Invalid Answer Submission")#str(form.quiz.id) + " "  + str(form.question.id) + " " +  str(quiz_id) + " " +  str(question_id))
+#            return HttpResponse(correct_tally)
             return redirect('/quizzes/{}/{}'.format(str(quiz_id),str(question_id)))
         #return HttpResponse(formset.errors)
         context = {'error' : formset.errors}

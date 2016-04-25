@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+<html>
+{% block content %}
+<head>
+<title>Begin Quiz</title>
+</head>
+<body>
+
+<h1>List of Available Quizzes</h1>
+
+<form action="{% url 'quizzes:beginquiz' quiz.id %}" method="post">
+    {% csrf_token %}
+    <ol>
+        {{ quizresultform.as_ul }}
+    </ol>
+    <input type="submit" value="Begin Quiz" />
+</form>
+
+</body>
+
+{% endblock %}
+</html>

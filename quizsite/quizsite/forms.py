@@ -24,17 +24,19 @@ class AddQuizForm(ModelForm):
         model = Quiz
         fields = ['name']
 
-#class QuestionForm(forms.Form):
-#    def __init__(self, answers, *args, **kwargs):
-#        self.answers = answers
-#        for answer in answers:
-#            field_name = "answer_%d" % answer.pk
-#            choices 
+class QuizResultForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(AnswerResultForm, self).__init__(*args, **kwargs)
+    class Meta:
+        model = QuizResult
+        fields = ['score','user','quiz','finished']
+#        widgets = {'score': forms.HiddenInput(), 'user': forms.HiddenInput(), 'finished':forms.HiddenInput()}
+#        widgets = {'quiz': forms.HiddenInput(), 'question': forms.HiddenInput(), 'answer': forms.HiddenInput(),'user':forms.HiddenInput()}
+
 
 class AnswerResultForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(AnswerResultForm, self).__init__(*args, **kwargs)
-#        self.fields['selected'].label = str(self.fields['answer']) 
     class Meta:
         model = AnswerResult
         fields = ['quiz', 'question','answer','user','selected']

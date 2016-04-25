@@ -42,20 +42,24 @@
 <form method="post" action="{% url 'quizzes:submitanswer' quiz.id question.id %}">
 {% csrf_token %}
 {{ formset.management_form }}
-    <table>
+<table>
+    <tr>
         {% for item in formset_answers %}
-           <!-- {% for field in form %}
-                {{field.field.initial}}
-            {% endfor %} -->
-            <ul>
-                {{ item.1.text }}{{ item.0 }}
-            </ul>
+            <td> {{ item.1.text }} </td>
+            <td> {{ item.0 }} </td>
         {% endfor %}
-    </table>
+    </tr>
+</table>
+<!--
+<table>
+        {% for item in formset_answers %}
+            {{ item.0 }}
+        {% endfor %}
+</table>
+-->
+
     <input type="submit" value="Submit Answer" />
 </form>
-
-
 <!--
 <form action="{% url 'quizzes:submitanswer' quiz.id question.id %}" method="post">
     {% csrf_token %}
