@@ -17,6 +17,9 @@
     <input type="submit" value="Begin Quiz" />
 </form>
 
+<br>
+<li><a href="{% url 'quizzes:question' quiz.id quiz.questions.all.0.id %}"> First question in Quiz: {{quiz}}</a></li>.
+
 </body>
 
 {% endblock %}

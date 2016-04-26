@@ -13,8 +13,11 @@
 
       <li><a href="{% url 'quizzes:quizzes' %}"> List of Quizzes</a></li>
       <br />
-      <li><a href="{% url 'quizzes:addquestion' %}"> Add a Question Here</a></li>
+      {% if user.is_superuser %}
+      <li><a href="{% url 'quizzes:addquestion' %}"> Add a Quiz, Question, or Answer</a></li>
       <br />
+      {% else %}
+      {% endif %}
       <li><a href="{% url 'account:register' %}"> Register an Account</a></li>
       <br />
       <li><a href="{% url 'django.contrib.auth.views.login' %}"> Login</a></li>

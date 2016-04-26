@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+<html>
+{% block content %}
+<head>
+<title>You have already begun this quiz.</title>
+</head>
+<body>
+
+{{ error }}
+<br>
+<li><a href="{% url 'quizzes:question' quiz.id quiz.questions.all.0.id %}"> First question in Quiz: {{quiz}}</a></li>.
+
+{% endblock %}
+</html>

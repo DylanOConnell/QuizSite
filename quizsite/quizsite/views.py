@@ -30,21 +30,8 @@ def logout_view(request):
 # View for the overall list of quizzes. Each quiz id is shown, and provides a link to the first question of that quiz
 def quizzes(request):
     quizzes_list = Quiz.objects.all()
-#    try:
-#        curr_user = request.USER
-#        test_list = []
-#        for curr_quiz in quizzes_list:
-#            if QuizResult.objects.filter(user = curr_user, quiz = curr_quiz):
-#
-#    except:
-#        started_quizzes = None
-#    test_list = []
-#    for quiz in quizzes_list:
-#        if QuizResult.objects.filter(
-  #  quizresult_list = QuizResult.objects.all()
     context = {
         'quizzes_list' : quizzes_list,
- #       'quizresult_list' : quizresult_list,
     }
     return render(request,'quizsite/quizzes.html',context)
 
@@ -55,8 +42,8 @@ def beginquiz(request,quiz_id):
             quizresultform = QuizResultForm(request.POST)
             if quizresultform.is_valid():
                 if QuizResult.objects.filter(quiz = quiz, user = request.user):
-                    context = {'error' : "You've already begun that quiz."}
-                    return render(request, 'quizsite/error.html', context)
+                    context = {'error' : "You've already begun that quiz.", 'quiz' : quiz}
+                    return render(request, 'quizsite/alreadybegunquiz.html', context)
                 else:
                     quizresultform.save()
                     return redirect('/quizzes/{}/{}'.format(quiz_id,quiz.questions.all().first().id))
@@ -90,6 +77,15 @@ def finishquiz(request, quiz_id):
                 return render(request, 'quizsite/error.html', context)
             else:
                 quizresult = QuizResult.objects.filter(quiz = quiz, user = request.user).first()
+                question_list = Question.objects.filter(quiz__id = quiz_id)
+                for question in question_list:
+                    answer_list = question.answer_set.all()
+                    for answer in answer_list:
+                        try:
+                            result = AnswerResult.objects.get(user = request.user, quiz = quiz, question = question, answer = answer)
+                        except:
+                            context = {'error' : "There is not exactly one submitted answer for Quiz: {}, Question: {}. Answer: {}".format(quiz, question, answer)}
+                            return render(request, 'quizsite/error.html', context)
                 quizresult.finished = True
                 quizresult.save()
                 return redirect('/')
@@ -101,19 +97,19 @@ def finishquiz(request, quiz_id):
         return render(request, 'quizsite/error.html', context)
 
 def quizresults(request, quiz_id):
-    if request.user.is_authentticated():
-        if QuizResult.objects.filter(quiz.id = quiz_id, user = request.user):
-            if QuizResult.objects.filter(quiz.id = quiz_id, user = request.user).first().finished:
+    if request.user.is_authentticated() and request.user.is_superuser:
+        get_object_or_404(Quiz,pk = quiz_id)
+        if QuizResult.objects.filter(quiz = quiz, user = request.user):
+            if QuizResult.objects.filter(quiz = quiz, user = request.user).first().finished:
                 context = {'error' : "This quiz is already finished."}
                 return render(request, 'quizsite/error.html', context)
             else:
+                return redirect('/')
         else:
             context = {'error' : "This quiz has not been begun."}
             return render(request, 'quizsite/error.html', context)
-
-
     else:
-        context = {'error' : "Must be logged in to see quiz results."}
+        context = {'error' : "Only superusers can see quiz results."}
         return render(request, 'quizsite/error.html', context)
 
 
@@ -155,42 +151,57 @@ def question(request, quiz_id, question_id):
         'prev_question' : prev_question,
         'prev_question_number' : prev_question_number,
         'curr_question_number' : curr_question_number,
-#        'formset' : formset,
+        'formset' : formset,
         'formset_answers': formset_answers,
     }
     return render(request,'quizsite/question.html',context)
 
-# This page has two purposes. It either accepts a post request to create a new question, or it displays two forms, which can be used to send a post request to create a new question or new answer.
+    # This page has two purposes. It either accepts a post request to create a new question, or it displays two forms, which can be used to send a post request to create a new question or new answer.
 def addquestion(request):
     # If post request, we take the informtion from a post request. 
     if request.method=="POST":
-        questionform = AddQuestionForm(request.POST)
-        # We clean the data, save the question, and then add its correct numbering, as well as QuestionOrdering object
-        if questionform.is_valid():
-            newquestion = Question(text=questionform.cleaned_data['text']) 
-            newquestion.save()
-            if QuestionOrdering.objects.filter(quiz = questionform.cleaned_data['quiz']).aggregate(Max('ordering'))['ordering__max']:
-                nextnumber = QuestionOrdering.objects.filter(quiz = questionform.cleaned_data['quiz']).aggregate(Max('ordering'))['ordering__max'] + 1
-            else:
-                nextnumber = 0
-            qordering = QuestionOrdering(quiz = questionform.cleaned_data['quiz'], question = newquestion, ordering = nextnumber )
-            qordering.save()
-            # Then, we display another Form to take in new information
-            questionform = AddQuestionForm()
-            answerform = AddAnswerForm()
-            quizform = AddQuizForm()
+        if request.user.is_superuser:
+            questionform = AddQuestionForm(request.POST)
+            # We clean the data, save the question, and then add its correct numbering, as well as QuestionOrdering object
+            if questionform.is_valid():
+                newquestion = Question(text=questionform.cleaned_data['text']) 
+                newquestion.save()
+                if QuestionOrdering.objects.filter(quiz = questionform.cleaned_data['quiz']):#.aggregate(Max('ordering'))['ordering__max']:
+                    nextnumber = QuestionOrdering.objects.filter(quiz = questionform.cleaned_data['quiz']).aggregate(Max('ordering'))['ordering__max'] + 1
+                else:
+                    nextnumber = 1
+                qordering = QuestionOrdering(quiz = questionform.cleaned_data['quiz'], question = newquestion, ordering = nextnumber )
+                qordering.save()
+                # Then, we display another Form to take in new information
+                questionform = AddQuestionForm()
+                answerform = AddAnswerForm()
+                quizform = AddQuizForm()
+                context = {
+                    'questionform':questionform,
+                    'answerform':answerform,
+                    'quizform':quizform,
+                }
+            return render(request,'quizsite/addquestion.html',context)
+        else:
+            context = {'error' : "Only superusers can change quizzes."}
+            return render(request, 'quizsite/error.html', context)
     # Tell the user (using the django functionality) telling the user why their form was not valid.
     # if post information not provided, simply display both forms.
     else:
-        questionform = AddQuestionForm()
-        answerform = AddAnswerForm()
-        quizform = AddQuizForm()
-    context = {
-        'questionform':questionform,
-        'answerform':answerform,
-        'quizform':quizform,
-    }
-    return render(request,'quizsite/addquestion.html',context)
+        if request.user.is_superuser:
+            questionform = AddQuestionForm()
+            answerform = AddAnswerForm()
+            quizform = AddQuizForm()
+            context = {
+                'questionform':questionform,
+                'answerform':answerform,
+                'quizform':quizform,
+            }
+            return render(request,'quizsite/addquestion.html',context)
+        else:
+            context = {'error' : "Only superusers can edit the quizzes."}
+            return render(request, 'quizsite/error.html', context)
+
 
 # This either takes in a POST request to create an answer, or simply redirects to the AddQuestion page.
 def addanswer(request):
@@ -213,46 +224,47 @@ def addquiz(request):
 
 def submitanswer(request, quiz_id, question_id):
     if request.method =="POST":
-        answerresult_formset = modelformset_factory(AnswerResult,AnswerResultForm,extra=1)#, extra=2)
-        formset = answerresult_formset(request.POST)
-        if formset.is_valid():
-            new_formset = formset.save(commit=False)
-            # Num correct, num partially wrong, num fully wrong
-            correct_tally = [0,0,0]
-            for form in new_formset:
-                if form.quiz.id == long(quiz_id) and form.question.id == long(question_id):
-                    try:
-                        form.user = request.user
-                        if AnswerResult.objects.filter(quiz__id = quiz_id, question__id = question_id, user = request.user, answer = form.answer):
-                            try:
+        if request.user.is_authenticated():
+            try:
+                QuizResult.objects.get(quiz__id = quiz_id, user = request.user, finished = False)
+                answerresult_formset = modelformset_factory(AnswerResult,AnswerResultForm,extra=1)#, extra=2)
+                formset = answerresult_formset(request.POST)
+                if formset.is_valid():
+                    new_formset = formset.save(commit=False)
+                    # Num correct, num partially wrong, num fully wrong
+                    correct_tally = [0,0,0]
+                    for form in new_formset:
+                        if form.quiz.id == long(quiz_id) and form.question.id == long(question_id):
+                            form.user = request.user
+                            if AnswerResult.objects.filter(quiz__id = quiz_id, question__id = question_id, user = request.user, answer = form.answer):
+    #                               ansres = AnswerResult.objects.get(quiz__id = quiz_id, question__id = question_id, user = request.user, answer = form.answer)
+    #                               if AnswerResult.objects.filter(quiz__id = quiz_id, question__id = question_id, user = request.user, answer = form.answer):
                                 AnswerResult.objects.filter(quiz__id = quiz_id, question__id = question_id, user = request.user,answer = form.answer).delete()
-                                #return HttpResponse(form.answer.id)
-                            except:
-                                context = {'error' : "You've already submitted an answer to that question."}
-                                return render(request, 'quizsite/error.html', context)
 
-                        form.save()
-                        if form.selected:
-                            if form.answer.correct_type == 'COR':
-                                correct_tally[0] = correct_tally[0] + 1
-                            if form.answer.correct_type == 'PART_W':
-                                correct_tally[1] = correct_tally[1] + 1
-                            if form.answer.correct_type == 'FULL_W':
-                                correct_tally[2] = correct_tally[2] + 1
-                        #return HttpResponse(form.answer.id)
-                    except:
-                        context = {'error' : "You must be logged in to submit an answer."}
-                        return render(request, 'quizsite/error.html', context)# HttpResponse("You must be logged in to submit an answer")
-                        
-                else:
-                    context = {'error' : "Invalid answer submission."}
-                    return render(request, 'quizsite/error.html', context)
-                    #return HttpResponse("Invalid Answer Submission")#str(form.quiz.id) + " "  + str(form.question.id) + " " +  str(quiz_id) + " " +  str(question_id))
-#            return HttpResponse(correct_tally)
-            return redirect('/quizzes/{}/{}'.format(str(quiz_id),str(question_id)))
-        #return HttpResponse(formset.errors)
-        context = {'error' : formset.errors}
-        return render(request, 'quizsite/error.html', context)
+                            form.save()
+                            if form.selected:
+                                if form.answer.correct_type == 'COR':
+                                    correct_tally[0] = correct_tally[0] + 1
+                                if form.answer.correct_type == 'PART_W':
+                                    correct_tally[2] = correct_tally[2] + 1
+                            #return HttpResponse(form.answer.id)
+                            
+                        else:
+                            context = {'error' : "Invalid answer submission."}
+                            return render(request, 'quizsite/error.html', context)
+                            #return HttpResponse("Invalid Answer Submission")#str(form.quiz.id) + " "  + str(form.question.id) + " " +  str(quiz_id) + " " +  str(question_id))
+        #            return HttpResponse(correct_tally)
+                    return redirect('/quizzes/{}/{}'.format(str(quiz_id),str(question_id)))
+                #return HttpResponse(formset.errors)
+                context = {'error' : formset.errors}
+                return render(request, 'quizsite/error.html', context)
+            except:
+                context = {'error' : "There is not a valid quiz attempt available. You have either not begun this quiz, you have already submitted this quiz, or there is an error and there is more than one quizzes."}
+                return render(request, 'quizsite/error.html', context)
+
+        else:
+            context = {'error' : "You must be logged in to submit an answer" }
+            return render(request, 'quizsite/error.html', context)
     else:
         return redirect('/')
 
