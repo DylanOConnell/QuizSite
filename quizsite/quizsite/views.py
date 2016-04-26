@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import loader
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .forms import AddQuestionForm, AddAnswerForm, AddQuizForm, QuizResultForm, AnswerResultForm
 from django.forms import modelformset_factory
@@ -102,41 +103,55 @@ def finishquiz(request, quiz_id):
         return render(request, 'quizsite/error.html', context)
 
 
-def checkresults(request):
+def checkresults(request, quiz_id):
     if request.user.is_authenticated() and request.user.is_superuser:
-        return redirect('/')
+        quiz = get_object_or_404(Quiz, pk=quiz_id)
+        quizresult_list = QuizResult.objects.filter(quiz=quiz, finished=True)
+        user_list = User.objects.filter(id__in=quizresult_list.values('user_id'))
+        context = {'quiz': quiz, 'user_list': user_list}
+        return render(request, 'quizsite/checkresults.html', context)
     else:
         context = {'error': "Only superusers can see quiz results."}
         return render(request, 'quizsite/error.html', context)
 
 
-def quizresults(request, username, quiz_id):
-    if request.user.is_authentticated() and request.user.is_superuser:
-        if request.method == "POST":
-            quiz = get_object_or_404(Quiz, pk=quiz_id)
-            user = get_object_or_404(User, username=username)
-            if len(QuizResult.objects.filter(quiz=quiz, user=request.user)) == 1:
-                if len(QuizResult.objects.filter(quiz=quiz, user=request.user, finished=True)) == 1:
-                    quizresult = QuizResult.objects.get(quiz=quiz, user=user)
-                    question_list = Question.objects.filter(quiz__id=quiz_id)
-                    for question in question_list:
-                        answer_list = question.answer_set.all()
-                        for answer in answer_list:
-                            try:
-                                result = AnswerResult.objects.get(user=request.user, quiz=quiz, question=question, answer=answer)
-                            except:
-                                context = {'error': "There is not exactly one submitted answer for Quiz: {}, Question: {}. Answer: {}".format(quiz, question, answer)}
-                                return render(request, 'quizsite/error.html', context)
-                    quizresult.finished = True
-
-                else:
-                    context = {'error': "The user has not yet submitted this quiz."}
-                    return render(request, 'quizsite/error.html', context)
+def quizresults(request, quiz_id, username):
+    if request.user.is_authenticated() and request.user.is_superuser:
+        quiz = get_object_or_404(Quiz, pk=quiz_id)
+        user = get_object_or_404(User, username=username)
+        if len(QuizResult.objects.filter(quiz=quiz, user=request.user)) == 1:
+            if len(QuizResult.objects.filter(quiz=quiz, user=request.user, finished=True)) == 1:
+                quizresult = get_object_or_404(QuizResult,quiz=quiz, user=user, finished=True)
+                question_list = Question.objects.filter(quiz__id=quiz_id)
+                score = 0
+                for question in question_list:
+                    correct_tally = [0, 0, 0]
+                    answer_list = question.answer_set.all()
+                    for answer in answer_list:
+                        try:
+                            result = AnswerResult.objects.get(user=request.user, quiz=quiz, question=question, answer=answer)
+                            if result.selected:
+                                if answer.correct_type == 'COR':
+                                    correct_tally[0] = correct_tally[0] + 1
+                                if answer.correct_type == 'PART_W':
+                                    correct_tally[1] = correct_tally[1] + 1
+                                if answer.correct_type == 'FULL_W':
+                                    correct_tally[2] = correct_tally[2] + 1
+                        except:
+                            context = {'error': "There is not exactly one submitted answer for Quiz: {}, Question: {}. Answer: {}".format(quiz, question, answer)}
+                            return render(request, 'quizsite/error.html', context)
+                    if correct_tally[2]>0:
+                        score += 0
+                    else:
+                        score += correct_tally[0]*(1/2)^(correct_tally[1])
+                quizresult.score = score
+                quizresult.save()
+                return HttpResponse(quizresult.score)
             else:
-                context = {'error': "The user has not yet begun this quiz, or there is a duplicate attempt in the system."}
+                context = {'error': "The user has not yet submitted this quiz."}
                 return render(request, 'quizsite/error.html', context)
         else:
-            context = {'error': "We must let admin choose the user."}
+            context = {'error': "The user has not yet begun this quiz, or there is a duplicate attempt in the system."}
             return render(request, 'quizsite/error.html', context)
     else:
         context = {'error': "Only superusers can see quiz results."}

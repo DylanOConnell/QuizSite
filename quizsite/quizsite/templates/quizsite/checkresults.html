@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+<html>
+{% block content %}
+<head>
+<title>Find User Results for Quiz: {{quiz}} </title>
+</head>
+<body>
+
+<h1> User Results for Quiz: {{quiz}}</h1>
+<p></p>
+
+{% if user_list %}
+    <ul>
+    {% for user in user_list %}
+        <li><a href="{% url 'quizzes:quizresults' quiz.id user.username %}">Result for User: {{user.username}}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No users have submitted this quiz.</p>
+{% endif %}
+</body>
+
+{% endblock %}
+</html>
