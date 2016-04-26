@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+<html>
+{% block content %}
+<head>
+<title> {{user}}'s results for {{quiz}} </title>
+</head>
+<body>
+
+<h1>{{user}}'s results for {{quiz}}</h1>
+{% for answer_list in answer_lists %}
+    {{answer_list.0.0.text}}
+    {{answer_list.1.0.selected}}
+{% endfor %}
+</body>
+{% endblock %}
+</html>
+

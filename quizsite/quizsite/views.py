@@ -103,6 +103,15 @@ def finishquiz(request, quiz_id):
         return render(request, 'quizsite/error.html', context)
 
 
+def listquizresults(request):
+    if request.user.is_authenticated() and request.user.is_superuser:
+        quizzes_list = Quiz.objects.all()
+        context = {
+            'quizzes_list': quizzes_list,
+        }
+        return render(request, 'quizsite/listquizresults.html', context)
+
+
 def checkresults(request, quiz_id):
     if request.user.is_authenticated() and request.user.is_superuser:
         quiz = get_object_or_404(Quiz, pk=quiz_id)
@@ -132,21 +141,29 @@ def quizresults(request, quiz_id, username):
                             result = AnswerResult.objects.get(user=request.user, quiz=quiz, question=question, answer=answer)
                             if result.selected:
                                 if answer.correct_type == 'COR':
-                                    correct_tally[0] = correct_tally[0] + 1
+                                    correct_tally[0] += 1
                                 if answer.correct_type == 'PART_W':
-                                    correct_tally[1] = correct_tally[1] + 1
+                                    correct_tally[1] += 1
                                 if answer.correct_type == 'FULL_W':
-                                    correct_tally[2] = correct_tally[2] + 1
+                                    correct_tally[2] += 1
                         except:
                             context = {'error': "There is not exactly one submitted answer for Quiz: {}, Question: {}. Answer: {}".format(quiz, question, answer)}
                             return render(request, 'quizsite/error.html', context)
+                    #return HttpResponse(correct_tally)
                     if correct_tally[2]>0:
                         score += 0
                     else:
-                        score += correct_tally[0]*(1/2)^(correct_tally[1])
+                        score += correct_tally[0]*((.5)**(correct_tally[1]))   # Scoring system, multiple partial wrong?
+                        #return HttpResponse(score)
                 quizresult.score = score
                 quizresult.save()
-                return HttpResponse(quizresult.score)
+                answer_lists = [zip(sorted(question.answer_set.all(), key = lambda x: x.id ), question.answerresult_set.all()) for question in question_list]
+                # newlist = sorted(ut, key=lambda x: x.count, reverse=True)
+                context = {
+                        'quiz': quiz,
+                        'answer_lists': answer_lists,
+                        }
+                return render(request, 'quizsite/quizresults.html', context)
             else:
                 context = {'error': "The user has not yet submitted this quiz."}
                 return render(request, 'quizsite/error.html', context)

@@ -3,9 +3,9 @@ from quizsite import views
 
 urlpatterns = [
     url(r'^$', views.quizzes, name='quizzes'),
+    url(r'^listquizresults$', views.listquizresults, name='listquizresults'),
     url(r'^(?P<quiz_id>[0-9]+)/(?P<question_id>[0-9]+)/$', views.question, name='question'),
     url(r'^addquestion$', views.addquestion, name='addquestion'),
-#    url(r'^(?P<quiz_id>[0-9]+)/startquiz$', views.startquiz, name='startquiz'),
     url(r'^(?P<quiz_id>[0-9]+)/beginquiz$', views.beginquiz, name='beginquiz'),
     url(r'^(?P<quiz_id>[0-9]+)/finishquiz$', views.finishquiz, name='finishquiz'),
     url(r'^(?P<quiz_id>[0-9]+)/checkresults$', views.checkresults, name='checkresults'),

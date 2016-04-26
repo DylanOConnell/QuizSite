@@ -24,6 +24,7 @@
       {% if user.is_superuser %}
       <p> Superuser Tools: </p>
       <li><a href="{% url 'quizzes:addquestion' %}"> Add a Quiz, Question, or Answer</a></li>
+      <li><a href="{% url 'quizzes:listquizresults' %}"> Check Quiz Results</a></li>
       <br>
       {% else %}
       {% endif %}

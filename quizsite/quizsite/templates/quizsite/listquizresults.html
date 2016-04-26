@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+<html>
+{% block content %}
+<head>
+<title>Quiz Results</title>
+</head>
+<body>
+
+<h1>List of Available Quiz Results</h1>
+<p></p>
+
+{% if quizzes_list %}
+    <ul>
+    {% for quiz in quizzes_list %}
+        {% if quiz.questions.all %}
+            <li><a href="{% url 'quizzes:checkresults' quiz.id %}">{{ quiz }}</a></li>
+        {% else %}
+            <li>{{quiz}}</li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No quizzes here.</p>
+{% endif %}
+</body>
+
+{% endblock %}
+</html>
