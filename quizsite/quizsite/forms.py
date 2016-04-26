@@ -30,9 +30,7 @@ class QuizResultForm(ModelForm):
     class Meta:
         model = QuizResult
         fields = ['score','user','quiz','finished']
-#        widgets = {'score': forms.HiddenInput(), 'user': forms.HiddenInput(), 'finished':forms.HiddenInput()}
-#        widgets = {'quiz': forms.HiddenInput(), 'question': forms.HiddenInput(), 'answer': forms.HiddenInput(),'user':forms.HiddenInput()}
-
+        widgets = {'score': forms.HiddenInput(), 'user': forms.HiddenInput(), 'finished':forms.HiddenInput()}
 
 class AnswerResultForm(ModelForm):
     def __init__(self, *args, **kwargs):

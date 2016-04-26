@@ -9,15 +9,9 @@ from quizcreator.models import Quiz, Question, Answer, QuestionOrdering, QuizRes
 from django.db.models import Max
 from django.contrib.auth import login, logout
 
-
-# FormSets
-
-
 # This is our basic homepage. For now, provides links to other pages.
 def home(request):
     return render(request,'quizsite/home.html')
-# Use login
-# use is_authenticate
 
 def login_view(request):
     return redirect('/login')
@@ -72,23 +66,28 @@ def finishquiz(request, quiz_id):
     if request.user.is_authenticated():
         quiz = get_object_or_404(Quiz, pk=quiz_id)
         if QuizResult.objects.filter(quiz = quiz, user = request.user):
-            if QuizResult.objects.filter(quiz = quiz, user = request.user).first().finished:
-                context = {'error' : "You have already completed this quiz."}
-                return render(request, 'quizsite/error.html', context)
+            if len(QuizResult.objects.filter(quiz = quiz, user = request.user)) == 1:
+                if QuizResult.objects.filter(quiz = quiz, user = request.user).first().finished:
+                    context = {'error' : "You have already completed this quiz."}
+                    return render(request, 'quizsite/error.html', context)
+                else:
+                    quizresult = QuizResult.objects.filter(quiz = quiz, user = request.user).first()
+                    question_list = Question.objects.filter(quiz__id = quiz_id)
+                    for question in question_list:
+                        answer_list = question.answer_set.all()
+                        for answer in answer_list:
+                            try:
+                                result = AnswerResult.objects.get(user = request.user, quiz = quiz, question = question, answer = answer)
+                            except:
+                                context = {'error' : "There is not exactly one submitted answer for Quiz: {}, Question: {}. Answer: {}".format(quiz, question, answer)}
+                                return render(request, 'quizsite/error.html', context)
+                    quizresult.finished = True
+                    quizresult.save()
+                    return redirect('/')
             else:
-                quizresult = QuizResult.objects.filter(quiz = quiz, user = request.user).first()
-                question_list = Question.objects.filter(quiz__id = quiz_id)
-                for question in question_list:
-                    answer_list = question.answer_set.all()
-                    for answer in answer_list:
-                        try:
-                            result = AnswerResult.objects.get(user = request.user, quiz = quiz, question = question, answer = answer)
-                        except:
-                            context = {'error' : "There is not exactly one submitted answer for Quiz: {}, Question: {}. Answer: {}".format(quiz, question, answer)}
-                            return render(request, 'quizsite/error.html', context)
-                quizresult.finished = True
-                quizresult.save()
-                return redirect('/')
+                context = {'error' : "There is an error, more than one quiz attempt active. Contact an administrator."}
+                return render(request, 'quizsite/error.html', context)
+
         else:
             context = {'error' : "You have not yet begun this quiz."}
             return render(request, 'quizsite/error.html', context)
@@ -96,18 +95,42 @@ def finishquiz(request, quiz_id):
         context = {'error' : "Must be logged in to end a quiz."}
         return render(request, 'quizsite/error.html', context)
 
-def quizresults(request, quiz_id):
+def checkresults(request):
+    if request.user.is_authenticated() and request.user.is_superuser:
+        return redirect('/')
+    else:
+        context = {'error' : "Only superusers can see quiz results."}
+        return render(request, 'quizsite/error.html', context)
+
+def quizresults(request, username, quiz_id):
     if request.user.is_authentticated() and request.user.is_superuser:
-        get_object_or_404(Quiz,pk = quiz_id)
-        if QuizResult.objects.filter(quiz = quiz, user = request.user):
-            if QuizResult.objects.filter(quiz = quiz, user = request.user).first().finished:
-                context = {'error' : "This quiz is already finished."}
-                return render(request, 'quizsite/error.html', context)
+        if request.method == "POST":
+            quiz = get_object_or_404(Quiz,pk = quiz_id)
+            user = get_object_or_404(User, username = username)
+            if len(QuizResult.objects.filter(quiz = quiz, user = request.user)) == 1:
+                if len(QuizResult.objects.filter(quiz = quiz, user = request.user,finished = True)) == 1:
+                    quizresult = QuizResult.objects.get(quiz = quiz, user = user)
+                    question_list = Question.objects.filter(quiz__id = quiz_id)
+                    for question in question_list:
+                        answer_list = question.answer_set.all()
+                        for answer in answer_list:
+                            try:
+                                result = AnswerResult.objects.get(user = request.user, quiz = quiz, question = question, answer = answer)
+                            except:
+                                context = {'error' : "There is not exactly one submitted answer for Quiz: {}, Question: {}. Answer: {}".format(quiz, question, answer)}
+                                return render(request, 'quizsite/error.html', context)
+                    quizresult.finished = True
+
+                else:
+                    context = {'error' : "The user has not yet submitted this quiz."}
+                    return render(request, 'quizsite/error.html', context)
             else:
-                return redirect('/')
+                context = {'error' : "The user has not yet begun this quiz, or there is a duplicate attempt in the system."}
+                return render(request, 'quizsite/error.html', context)
         else:
-            context = {'error' : "This quiz has not been begun."}
+            context = {'error' : "We must let admin choose the user."}
             return render(request, 'quizsite/error.html', context)
+            
     else:
         context = {'error' : "Only superusers can see quiz results."}
         return render(request, 'quizsite/error.html', context)
@@ -259,8 +282,13 @@ def submitanswer(request, quiz_id, question_id):
                 context = {'error' : formset.errors}
                 return render(request, 'quizsite/error.html', context)
             except:
-                context = {'error' : "There is not a valid quiz attempt available. You have either not begun this quiz, you have already submitted this quiz, or there is an error and there is more than one quizzes."}
-                return render(request, 'quizsite/error.html', context)
+                try:
+                    QuizResult.objects.get(quiz__id = quiz_id, user = request.user, finished = True)
+                    context = {'error' : "You have already submitted this quiz attempt. If you are eligible to retake this quiz, contact the administrator."}
+                    return render(request, 'quizsite/error.html', context)
+                except:
+                    context = {'error' : "There is not a valid quiz attempt available. You have either not begun this quiz, or there is an error and there is more than one quizzes."}
+                    return render(request, 'quizsite/error.html', context)
 
         else:
             context = {'error' : "You must be logged in to submit an answer" }

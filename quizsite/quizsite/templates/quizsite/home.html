@@ -11,19 +11,22 @@
 <p></p>
 
 
+      {% if not user.is_authenticated %}
+      <li><a href="{% url 'django.contrib.auth.views.login' %}"> Login</a></li>
+      <br>
+      <li><a href="{% url 'account:register' %}"> Register an Account</a></li>
+      <br>
+      {% else %}
+      <li><a href="{% url 'account:logout' %}"> Logout</a></li> <br>
+      {% endif %}
       <li><a href="{% url 'quizzes:quizzes' %}"> List of Quizzes</a></li>
-      <br />
+      <br>
       {% if user.is_superuser %}
+      <p> Superuser Tools: </p>
       <li><a href="{% url 'quizzes:addquestion' %}"> Add a Quiz, Question, or Answer</a></li>
-      <br />
+      <br>
       {% else %}
       {% endif %}
-      <li><a href="{% url 'account:register' %}"> Register an Account</a></li>
-      <br />
-      <li><a href="{% url 'django.contrib.auth.views.login' %}"> Login</a></li>
-      <br />
-      <li><a href="{% url 'account:logout' %}"> Logout</a></li>
-      <br />
 
 </body>
 

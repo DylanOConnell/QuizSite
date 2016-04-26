@@ -8,6 +8,23 @@
 <body>
 
 <h1>Question #{{curr_question_number}}:</h1>
+<legend> Question #{{curr_question_number}}: {{question.text}} </legend>
+<br>
+<form method="post" action="{% url 'quizzes:submitanswer' quiz.id question.id %}">
+{% csrf_token %}
+{{ formset.management_form }}
+<table>
+    <tr>
+        {% for item in formset_answers %}
+            <td> {{ item.1.text }} </td>
+            <td> {{ item.0 }} </td>
+        {% endfor %}
+    </tr>
+</table>
+    <input type="submit" value="Submit Answer" />
+</form>
+<br>
+<!--
 <p></p>
 <form action="{% url 'quizzes:submitanswer' quiz.id question.id %}" method="post">
     <fieldset>
@@ -26,7 +43,7 @@
         {% endif %}
     </fieldset><br />
 </form>
-
+-->
 {% if prev_question %}
     <li><a href="{% url 'quizzes:question' quiz.id prev_question.id %}">Previous: Question {{ prev_question_number}}</a></li>
 {% else %}
@@ -36,23 +53,10 @@
 {% if next_question %}
     <li><a href="{% url 'quizzes:question' quiz.id next_question.id %}">Next: Question {{ next_question_number}}</a></li>
 {% else %}
-    <li> Final question in the quiz. </li>
-    <a href="{% url 'quizzes:finishquiz' quiz.id %}">Finish the quiz: {{quiz}}</a>
+<li> Final question in the quiz. </li> <br>
+    <a href="{% url 'quizzes:finishquiz' quiz.id %}">Submit the quiz: {{quiz}}</a>
 {% endif %}
 
-<form method="post" action="{% url 'quizzes:submitanswer' quiz.id question.id %}">
-{% csrf_token %}
-{{ formset.management_form }}
-<table>
-    <tr>
-        {% for item in formset_answers %}
-            <td> {{ item.1.text }} </td>
-            <td> {{ item.0 }} </td>
-        {% endfor %}
-    </tr>
-</table>
-    <input type="submit" value="Submit Answer" />
-</form>
 <!--
 <form action="{% url 'quizzes:submitanswer' quiz.id question.id %}" method="post">
     {% csrf_token %}
