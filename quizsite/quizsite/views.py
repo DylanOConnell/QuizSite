@@ -157,11 +157,12 @@ def quizresults(request, quiz_id, username):
                         #return HttpResponse(score)
                 quizresult.score = score
                 quizresult.save()
-                answer_lists = [zip(sorted(question.answer_set.all(), key = lambda x: x.id ), question.answerresult_set.all()) for question in question_list]
+                answer_lists = zip(question_list, [zip(sorted(question.answer_set.all(), key = lambda x: x.id ), question.answerresult_set.all()) for question in question_list])
                 # newlist = sorted(ut, key=lambda x: x.count, reverse=True)
                 context = {
                         'quiz': quiz,
                         'answer_lists': answer_lists,
+                        'score': score,
                         }
                 return render(request, 'quizsite/quizresults.html', context)
             else:

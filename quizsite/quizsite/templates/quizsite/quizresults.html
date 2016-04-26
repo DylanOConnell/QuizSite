@@ -8,10 +8,25 @@
 <body>
 
 <h1>{{user}}'s results for {{quiz}}</h1>
-{% for answer_list in answer_lists %}
-    {{answer_list.0.0.text}}
-    {{answer_list.1.0.selected}}
+{% for question_answers in answer_lists %}
+    <table border = "1">
+        {{question_answers.0.text}}
+            <th>Answer: </th>
+            <th>User Selected: </th>
+            <th>Correctness: </th>
+        {% for answer_result in question_answers.1 %}
+            <tr>
+            <td>{{answer_result.0.text}}</td>
+            <td>{{answer_result.1.selected}}</td>
+            <td>{{answer_result.0.get_correct_type_display}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br>`
 {% endfor %}
+<p>
+FINAL SCORE: {{score}}
+</p>
 </body>
 {% endblock %}
 </html>
