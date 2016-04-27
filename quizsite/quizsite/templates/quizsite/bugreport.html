@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+<html>
+{% block content %}
+    <head>
+        <base href="{% url 'quizzes:bugreport' %}" />
+        <title>"Submit Bug Report"</title>
+    </head>
+    <body>
+        <form action="{% url 'quizzes:bugreport' %}" method="post">
+            {% csrf_token %}
+            <ol>
+            {{ bugreportform }}
+            </ol>
+            <input type="submit" value="Submit Bug Report" />
+        </form>
+    </body>
+{% endblock %}
+</html>
+
+

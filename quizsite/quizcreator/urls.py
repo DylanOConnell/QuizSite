@@ -13,5 +13,6 @@ urlpatterns = [
     url(r'^addanswer$', views.addanswer, name='addanswer'),
     url(r'^addquiz$', views.addquiz, name='addquiz'),
     url(r'^(?P<quiz_id>[0-9]+)/(?P<question_id>[0-9]+)/submitanswer$', views.submitanswer, name='submitanswer'),
+    url(r'^bugreport$', views.bugreport, name='bugreport'),
 ]
 

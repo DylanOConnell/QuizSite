@@ -1,12 +1,13 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import loader
+from datetime import datetime
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .forms import AddQuestionForm, AddAnswerForm, AddQuizForm, QuizResultForm, AnswerResultForm
+from .forms import AddQuestionForm, AddAnswerForm, AddQuizForm, QuizResultForm, AnswerResultForm, BugReportForm
 from django.forms import modelformset_factory
-from quizcreator.models import Quiz, Question, Answer, QuestionOrdering, QuizResult, AnswerResult
+from quizcreator.models import Quiz, Question, Answer, QuestionOrdering, QuizResult, AnswerResult, BugReport
 from django.db.models import Max
 from django.contrib.auth import login, logout
 
@@ -64,7 +65,7 @@ def beginquiz(request, quiz_id):
             quizresultform = QuizResultForm(initial={'quiz': quiz, 'user': user, 'finished': False})
         context = {
                 'quiz': quiz,
-                'quizresultform': quizresultform
+                'quizresultform': quizresultform,
                 }
         return render(request, 'quizsite/beginquiz.html', context)
 
@@ -293,7 +294,7 @@ def submitanswer(request, quiz_id, question_id):
         if request.user.is_authenticated():
             try:
                 QuizResult.objects.get(quiz__id=quiz_id, user=request.user, finished=False)
-                answerresult_formset = modelformset_factory(AnswerResult, AnswerResultForm, extra=1)#, extra=2)
+                answerresult_formset = modelformset_factory(AnswerResult, AnswerResultForm, extra=1)
                 formset = answerresult_formset(request.POST)
                 if formset.is_valid():
                     new_formset = formset.save(commit=False)
@@ -346,3 +347,26 @@ def register(request):
         form = UserCreationForm()
     context = {'form': form}
     return render(request, 'registration/register.html', context)
+
+def bugreport(request):
+    if request.method == 'POST':
+        if request.user.is_authenticated():
+            bugreport = BugReportForm(request.POST)
+            bugreport.user = request.user
+            bugreport.timestamp = datetime.now()
+            if bugreport.is_valid():
+                bugreport.save()
+                return redirect('/')
+            else:
+                context = {'error': bugreport.errors}
+                return render(request, 'quizsite/error.html', context)
+        else:
+            context = {'error': "You must be logged in to submit a bug report"}
+            return render(request, 'quizsite/error.html', context)
+
+    else:
+        bugreportform = BugReportForm(initial={'user': request.user, 'timestamp': datetime.now()})
+        context = {
+                'bugreportform': bugreportform,
+                }
+        return render(request, 'quizsite/bugreport.html', context)

@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from quizcreator.models import Quiz, Question, Answer, QuestionOrdering, QuizResult, AnswerResult
+from quizcreator.models import Quiz, Question, Answer, QuestionOrdering, QuizResult, AnswerResult, BugReport
 
 
 # This takes in the required information, and creates a question with text and links it to a quiz.
@@ -29,7 +29,7 @@ class AddQuizForm(ModelForm):
 
 class QuizResultForm(ModelForm):
     def __init__(self, *args, **kwargs):
-        super(AnswerResultForm, self).__init__(*args, **kwargs)
+        super(QuizResultForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = QuizResult
@@ -56,3 +56,10 @@ class QuizResultForm(ModelForm):
     class Meta:
         model = QuizResult
         fields = ['score', 'user', 'quiz']
+
+class BugReportForm(ModelForm):
+    class Meta:
+        model = BugReport
+        fields = ['user', 'report', 'timestamp']
+        widgets = {'user': forms.HiddenInput(), 'timestamp': forms.HiddenInput(), 'report': forms.Textarea()}
+

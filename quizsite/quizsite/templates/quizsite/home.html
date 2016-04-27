@@ -21,6 +21,8 @@
       {% endif %}
       <li><a href="{% url 'quizzes:quizzes' %}"> List of Quizzes</a></li>
       <br>
+      <li><a href="{% url 'quizzes:bugreport' %}"> Find an issue? Submit a bug report! </a></li>
+      <br>
       {% if user.is_superuser %}
       <p> Superuser Tools: </p>
       <li><a href="{% url 'quizzes:addquestion' %}"> Add a Quiz, Question, or Answer</a></li>
@@ -29,6 +31,7 @@
       <br>
       {% else %}
       {% endif %}
+
 
 </body>
 
