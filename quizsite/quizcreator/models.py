@@ -46,7 +46,7 @@ class Answer(models.Model):
 
 class QuizResult(models.Model):
     score = models.IntegerField(default=0)
-    user = models.ForeignKey(User, null=True, blank=True)
+    user = models.ForeignKey(User)
     quiz = models.ForeignKey(Quiz)
     finished = models.BooleanField(default=False)
 

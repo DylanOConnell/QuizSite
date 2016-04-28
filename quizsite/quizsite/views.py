@@ -81,11 +81,11 @@ def beginquiz(request, quiz_id):
             user = request.user
             # We provide the initial data for the QuizResult form.
             quizresultform = QuizResultForm(initial={'quiz': quiz, 'user': user, 'finished': False})
-        context = {
-                'quiz': quiz,
-                'quizresultform': quizresultform,
-                }
-        return render(request, 'quizsite/beginquiz.html', context)
+            context = {
+                    'quiz': quiz,
+                    'quizresultform': quizresultform,
+                    }
+            return render(request, 'quizsite/beginquiz.html', context)
 
 
 def finishquiz(request, quiz_id):
@@ -167,9 +167,9 @@ def quizresults(request, quiz_id, username):
     if request.user.is_authenticated() and request.user.is_superuser:
         quiz = get_object_or_404(Quiz, pk=quiz_id)
         user = get_object_or_404(User, username=username)
-        if len(QuizResult.objects.filter(quiz=quiz, user=request.user)) == 1:
-            if len(QuizResult.objects.filter(quiz=quiz, user=request.user, finished=True)) == 1:
-                quizresult = get_object_or_404(QuizResult,quiz=quiz, user=user, finished=True)
+        if len(QuizResult.objects.filter(quiz=quiz, user=user)) == 1:
+            if len(QuizResult.objects.filter(quiz=quiz, user=user, finished=True)) == 1:
+                quizresult = get_object_or_404(QuizResult, quiz=quiz, user=user, finished=True)
                 question_list = Question.objects.filter(quiz__id=quiz_id)
                 # This is the first time that score is properly calculated, and set, in the QuizResult object.
                 # The quiz is not scored until a superuser checks the results.
@@ -180,7 +180,7 @@ def quizresults(request, quiz_id, username):
                     answer_list = question.answer_set.all()
                     for answer in answer_list:
                         try:
-                            result = AnswerResult.objects.get(user=request.user, quiz=quiz, question=question, answer=answer)
+                            result = AnswerResult.objects.get(user=user, quiz=quiz, question=question, answer=answer)
                             if result.selected:
                                 if answer.correct_type == 'COR':
                                     correct_tally[0] += 1
@@ -201,11 +201,12 @@ def quizresults(request, quiz_id, username):
                 # We zip the answers and responses together, then zip the list of those lists with the list of questions.
                 # This allows the template to easily iterate through these lists and display them.
                 # We sort the answers and answerresults by answer.id so that they correctly match
-                answer_lists = zip(question_list, [zip(sorted(question.answer_set.all(), key = lambda x: x.id), sorted(question.answerresult_set.all(), key = lambda x: x.answer.id)) for question in question_list])
+                answer_lists = zip(question_list, [zip(sorted(question.answer_set.all(), key = lambda x: x.id), sorted(question.answerresult_set.filter(user=user), key = lambda x: x.answer.id)) for question in question_list])
                 context = {
                         'quiz': quiz,
                         'answer_lists': answer_lists,
                         'score': score,
+                        'this_user': user,
                         }
                 return render(request, 'quizsite/quizresults.html', context)
             else:
@@ -439,3 +440,9 @@ def bugreport(request):
                 'bugreportform': bugreportform,
                 }
         return render(request, 'quizsite/bugreport.html', context)
+
+def viewbugreports(request):
+    if request.user.is_authenticated and request.user.is_superuser:
+        bugreport_list = BugReport.objects.all()
+        context = {'bugreport_list': bugreport_list}
+        return render(request, 'quizsite/viewbugreports.html', context)

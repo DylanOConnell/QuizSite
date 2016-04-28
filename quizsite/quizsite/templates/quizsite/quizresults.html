@@ -3,11 +3,11 @@
 <html>
 {% block content %}
 <head>
-<title> {{user}}'s results for {{quiz}} </title>
+<title> {{this_user}}'s results for {{quiz}} </title>
 </head>
 <body>
 
-<h1>{{user}}'s results for {{quiz}}</h1>
+<h1>{{this_user}}'s results for {{quiz}}</h1>
 {% for question_answers in answer_lists %}
     <table border = "1">
         {{question_answers.0.text}}
@@ -22,7 +22,7 @@
             </tr>
         {% endfor %}
     </table>
-    <br>`
+    <br>
 {% endfor %}
 <p>
 FINAL SCORE: {{score}}

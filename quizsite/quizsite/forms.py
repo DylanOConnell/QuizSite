@@ -28,13 +28,14 @@ class AddQuizForm(ModelForm):
 
 
 class QuizResultForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(QuizResultForm, self).__init__(*args, **kwargs)
-
+#    def __init__(self, *args, **kwargs):
+#        super(QuizResultForm, self).__init__(*args, **kwargs)
+#
     class Meta:
         model = QuizResult
         fields = ['score', 'user', 'quiz', 'finished']
-        widgets = {'score': forms.HiddenInput(), 'user': forms.HiddenInput(), 'finished': forms.HiddenInput()}
+#        widgets = {'score': forms.HiddenInput(), 'user': forms.HiddenInput(), 'finished': forms.HiddenInput()}
+        widgets = {'user': forms.HiddenInput(), 'quiz': forms.HiddenInput(), 'user': forms.HiddenInput()}
 
 
 class AnswerResultForm(ModelForm):

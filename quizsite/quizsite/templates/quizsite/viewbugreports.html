@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+<html>
+{% block content %}
+<head>
+<title> Bug reports </title>
+</head>
+<body>
+
+<h1>Bug Reports</h1>
+<table border = "1">
+{% for bugreport in bugreport_list %}
+            <th>User: </th>
+            <th>Time Stamp: </th>
+            <th>Bug Report: </th>
+            <tr>
+            <td>{{bugreport.user}}</td>
+            <td>{{bugreport.timestamp}}</td>
+            <td>{{bugreport.report}}</td>
+            </tr>
+    <br>
+{% endfor %}
+</table>
+</body>
+{% endblock %}
+</html>
+
