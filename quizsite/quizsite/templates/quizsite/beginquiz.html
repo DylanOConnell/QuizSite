@@ -3,22 +3,22 @@
 <html>
 {% block content %}
 <head>
-<title>Begin Quiz</title>
+<title>Begin Quiz: {{quiz}}</title>
 </head>
 <body>
 
-<h1>List of Available Quizzes</h1>
-
+<h1>Begin Quiz: {{quiz}}</h1>
+ 
 <form action="{% url 'quizzes:beginquiz' quiz.id %}" method="post">
     {% csrf_token %}
     <ol>
-        {{ quizresultform.as_ul }}
+        {{ quizresultform }}
     </ol>
     <input type="submit" value="Begin Quiz" />
 </form>
 
 <br>
-<li><a href="{% url 'quizzes:question' quiz.id quiz.questions.all.0.id %}"> First question in Quiz: {{quiz}}</a></li>.
+<li><a href="{% url 'quizzes:question' quiz.id quiz.questions.all.0.id %}"> Skip to the first question in Quiz: {{quiz}} without beginning the quiz attempt.</a></li>.
 
 </body>
 

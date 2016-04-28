@@ -28,14 +28,13 @@ class AddQuizForm(ModelForm):
 
 
 class QuizResultForm(ModelForm):
-#    def __init__(self, *args, **kwargs):
-#        super(QuizResultForm, self).__init__(*args, **kwargs)
-#
+    def __init__(self, *args, **kwargs):
+        super(QuizResultForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = QuizResult
         fields = ['score', 'user', 'quiz', 'finished']
-#        widgets = {'score': forms.HiddenInput(), 'user': forms.HiddenInput(), 'finished': forms.HiddenInput()}
-        widgets = {'user': forms.HiddenInput(), 'quiz': forms.HiddenInput(), 'user': forms.HiddenInput()}
+        widgets = {'score': forms.HiddenInput(), 'user': forms.HiddenInput(), 'quiz': forms.HiddenInput(), 'finished': forms.HiddenInput()}
 
 
 class AnswerResultForm(ModelForm):
@@ -53,14 +52,13 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput, label="Password")
 
 
-class QuizResultForm(ModelForm):
-    class Meta:
-        model = QuizResult
-        fields = ['score', 'user', 'quiz']
+#class QuizResultForm(ModelForm):
+#    class Meta:
+#        model = QuizResult
+#        fields = ['score', 'user', 'quiz']
 
 class BugReportForm(ModelForm):
     class Meta:
         model = BugReport
         fields = ['user', 'report', 'timestamp']
         widgets = {'user': forms.HiddenInput(), 'timestamp': forms.HiddenInput(), 'report': forms.Textarea()}
-
