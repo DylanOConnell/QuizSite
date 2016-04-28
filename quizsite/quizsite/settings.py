@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 #from password import password
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -112,3 +113,6 @@ USE_TZ = True
 STATIC_ROOT = '/homes/doconnel/quizfiles/quizsite/static/'
 
 STATIC_URL = '/static/'
+
+if 'test' in sys.argv or 'test_coverage' in sys.argv: #Covers regular testing and django-coverage
+        DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
