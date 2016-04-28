@@ -87,6 +87,23 @@ def beginquiz(request, quiz_id):
                     }
             return render(request, 'quizsite/beginquiz.html', context)
 
+# After submitting the final answer, this view allows the user to choose 
+# whether to submit the quiz attempt, or to return to the quiz
+def endofquiz(request, quiz_id):
+    """ Gives the user the option submit quiz, or go back to start"""
+    if request.user.is_authenticated():
+        quiz = get_object_or_404(Quiz, pk=quiz_id)
+        # We find the first question in the quiz, if available
+        try:
+            first_question = quiz.questions.all().first()
+        except:
+            first_question = None
+        context = {'quiz': quiz, 'first_question': first_question}
+        return render(request, 'quizsite/endofquiz.html', context)
+    else:
+        context = {'error': "Must be logged in to end a quiz."}
+        return render(request, 'quizsite/error.html', context)
+
 
 def finishquiz(request, quiz_id):
     """For a given quiz, attempts to submit the current users answers.
@@ -121,7 +138,8 @@ def finishquiz(request, quiz_id):
                     # If the answers are all there, finish the quiz.
                     quizresult.finished = True
                     quizresult.save()
-                    return redirect('/')
+                    context = {'quiz': quiz}
+                    return render(request, 'quizsite/submittedquiz.html', context)
             else:
                 context = {'error': "There is an error, more than one quiz attempt active. Contact an administrator."}
                 return render(request, 'quizsite/error.html', context)
@@ -181,6 +199,7 @@ def quizresults(request, quiz_id, username):
                     for answer in answer_list:
                         try:
                             result = AnswerResult.objects.get(user=user, quiz=quiz, question=question, answer=answer)
+                            # If they selected this answer, we record which type it truly was 
                             if result.selected:
                                 if answer.correct_type == 'COR':
                                     correct_tally[0] += 1
@@ -191,6 +210,7 @@ def quizresults(request, quiz_id, username):
                         except:
                             context = {'error': "There is not exactly one submitted answer for Quiz: {}, Question: {}. Answer: {}".format(quiz, question, answer)}
                             return render(request, 'quizsite/error.html', context)
+                    # We calculate their score for this question using this formula
                     if correct_tally[2]>0:
                         score += 0
                     else:
@@ -201,7 +221,7 @@ def quizresults(request, quiz_id, username):
                 # We zip the answers and responses together, then zip the list of those lists with the list of questions.
                 # This allows the template to easily iterate through these lists and display them.
                 # We sort the answers and answerresults by answer.id so that they correctly match
-                answer_lists = zip(question_list, [zip(sorted(question.answer_set.all(), key = lambda x: x.id), sorted(question.answerresult_set.filter(user=user), key = lambda x: x.answer.id)) for question in question_list])
+                answer_lists = zip(question_list, [zip(sorted(question.answer_set.all(), key=lambda x: x.id), sorted(question.answerresult_set.filter(user=user), key=lambda x: x.answer.id)) for question in question_list])
                 context = {
                         'quiz': quiz,
                         'answer_lists': answer_lists,
@@ -379,12 +399,12 @@ def submitanswer(request, quiz_id, question_id):
                         question = get_object_or_404(Question, pk=question_id)
                         next_question = Question.objects.get(quiz__id=quiz.id, questionordering__ordering=(question.questionordering_set.get(quiz_id=quiz.id).ordering+1))
                         return redirect('/quizzes/{}/{}'.format(str(quiz_id), str(next_question.id)))
-                    # If there is no valid next question, simply redirect to the same question
+                    # If there is no valid next question, send the user to the endofquiz pagen
                     except:
-                        return redirect('/quizzes/{}/{}'.format(str(quiz_id), str(question_id)))
+                        return redirect('/quizzes/{}/endofquiz'.format(str(quiz_id)))
                 context = {'error': formset.errors}
                 return render(request, 'quizsite/error.html', context)
-            # IF not exactly one valid quizresult, we check what the issue is, and display that error.
+            # If not exactly one valid quizresult, we check what the issue is, and display that error.
             except:
                 try:
                     QuizResult.objects.get(quiz__id=quiz_id, user=request.user, finished=True)
@@ -417,15 +437,21 @@ def register(request):
     context = {'form': form}
     return render(request, 'registration/register.html', context)
 
+
+# This page allows the user to submit a bug report, or it processes a submitted bug report 
+# POST request and redirects the user to the home page.
 def bugreport(request):
+    """This page displays a bug report form, and processes a submitted bug report form"""
     if request.method == 'POST':
         # Only logged in users can submit bug reports
         if request.user.is_authenticated():
             bugreport = BugReportForm(request.POST)
+            # We ensure that the bugreport has the current user and time
             bugreport.user = request.user
             bugreport.timestamp = datetime.now()
             if bugreport.is_valid():
                 bugreport.save()
+                # If bug is reported, sends user back to home page
                 return redirect('/')
             else:
                 context = {'error': bugreport.errors}
@@ -433,7 +459,6 @@ def bugreport(request):
         else:
             context = {'error': "You must be logged in to submit a bug report"}
             return render(request, 'quizsite/error.html', context)
-
     else:
         bugreportform = BugReportForm(initial={'user': request.user, 'timestamp': datetime.now()})
         context = {
@@ -441,7 +466,10 @@ def bugreport(request):
                 }
         return render(request, 'quizsite/bugreport.html', context)
 
+
+# This page is for superusers, and displays a table of all submitted bug reports
 def viewbugreports(request):
+    """Superusers use this page to view all submitted bug reports"""
     if request.user.is_authenticated and request.user.is_superuser:
         bugreport_list = BugReport.objects.all()
         context = {'bugreport_list': bugreport_list}

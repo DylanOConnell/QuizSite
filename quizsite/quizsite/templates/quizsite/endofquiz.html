@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+<html>
+{% block content %}
+<head>
+<title> End of Quiz: {{quiz} </title>
+</head>
+<body>
+
+<p> You may now either submit this quiz (which will be final), or you may return to the first question in this quiz to change your previous answers </p>
+<li> <a href="{% url 'quizzes:finishquiz' quiz.id %}">Submit the quiz: {{quiz}}</a> </li>
+<br>
+{% if first_question %}
+<li><a href="{% url 'quizzes:question' quiz.id first_question.id %}"> Return to the first question in Quiz: {{quiz}}</a></li>
+{% else %}
+{% endif %}
+</body>
+{% endblock %}
+</html>
+

@@ -36,7 +36,7 @@
     <li><a href="{% url 'quizzes:question' quiz.id next_question.id %}">Next: Question {{ next_question_number}}</a></li>
 {% else %}
 <li> Final question in the quiz. </li> <br>
-    <a href="{% url 'quizzes:finishquiz' quiz.id %}">Submit the quiz: {{quiz}}</a>
+<!--  <a href="{% url 'quizzes:finishquiz' quiz.id %}">Submit the quiz: {{quiz}}</a> -->
 {% endif %}
 </p>
 </body>
