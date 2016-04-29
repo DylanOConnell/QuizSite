@@ -74,18 +74,14 @@ def beginquiz(request, quiz_id):
     else:
         # If not POST, we display the QuizResult form to begin a quiz.
         quiz = get_object_or_404(Quiz, pk=quiz_id)
-        if not request.user.is_authenticated():
-            context = {'error': "You must be logged in to begin a quiz."}
-            return render(request, 'quizsite/error.html', context)
-        else:
-            user = request.user
-            # We provide the initial data for the QuizResult form.
-            quizresultform = QuizResultForm(initial={'quiz': quiz, 'user': user, 'finished': False})
-            context = {
-                    'quiz': quiz,
-                    'quizresultform': quizresultform,
-                    }
-            return render(request, 'quizsite/beginquiz.html', context)
+        user = request.user
+        # We provide the initial data for the QuizResult form.
+        quizresultform = QuizResultForm(initial={'quiz': quiz, 'user': user, 'finished': False})
+        context = {
+                'quiz': quiz,
+                'quizresultform': quizresultform,
+                }
+        return render(request, 'quizsite/beginquiz.html', context)
 
 # After submitting the final answer, this view allows the user to choose 
 # whether to submit the quiz attempt, or to return to the quiz

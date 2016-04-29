@@ -7,8 +7,10 @@
 </head>
 <body>
 
+{% if user.is_authenticated %}
+
 <h1>Begin Quiz: {{quiz}}</h1>
- 
+<p> Click the button below to begin a quiz attempt. </p>
 <form action="{% url 'quizzes:beginquiz' quiz.id %}" method="post">
     {% csrf_token %}
     <ol>
@@ -18,8 +20,14 @@
 </form>
 
 <br>
+<p> Alternatively, if you would like to simply view the questions in the quiz, you can click on the link below </p> 
 <li><a href="{% url 'quizzes:question' quiz.id quiz.questions.all.0.id %}"> Skip to the first question in Quiz: {{quiz}} without beginning the quiz attempt.</a></li>.
 
+{% else %}
+<p> You are not logged in, so you may not begin a quiz attempt. However, you can follow the link below to the first question in this quiz. </p> 
+<li><a href="{% url 'quizzes:question' quiz.id quiz.questions.all.0.id %}"> Skip to the first question in Quiz: {{quiz}} without beginning the quiz attempt.</a></li>.
+
+{% endif %}
 </body>
 
 {% endblock %}

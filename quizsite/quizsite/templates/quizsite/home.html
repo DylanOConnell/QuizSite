@@ -7,16 +7,18 @@
 </head>
 <body>
 
-<h1>Dylan O'Connell Quiz Homepage</h1>
-<p></p>
+<h1>Dylan O'Connell's Quizsite Homepage</h1>
+<p>  </p>
 
 
       {% if not user.is_authenticated %}
+      <p> You must be logged in before you can take a quiz. If you do not yet have an account, you can register below. </p>
       <li><a href="{% url 'django.contrib.auth.views.login' %}"> Login</a></li>
       <br>
       <li><a href="{% url 'account:register' %}"> Register an Account</a></li>
       <br>
       {% else %}
+      <p> Welcome back, {{user}}. If you'd like to begin a new quiz, click "List of Quizzes" to select which quiz.  </p>
       <li><a href="{% url 'account:logout' %}"> Logout</a></li> <br>
       {% endif %}
       <li><a href="{% url 'quizzes:quizzes' %}"> List of Quizzes</a></li>
@@ -24,11 +26,12 @@
       <li><a href="{% url 'quizzes:bugreport' %}"> Find an issue? Submit a bug report! </a></li>
       <br>
       {% if user.is_superuser %}
-      <p> Superuser Tools: </p>
+      <h2> Superuser Tools: </h2>
+      <p> If you'd like to add a quiz or add content to an existing one, click on below.
       <li><a href="{% url 'quizzes:addquestion' %}"> Add a Quiz, Question, or Answer</a></li>
-      <br>
+      <p> If you'd like to view the results of a quiz, click below to see a list of possible quizzes. </p>
       <li><a href="{% url 'quizzes:listquizresults' %}"> Check Quiz Results</a></li>
-      <br>
+      <p> If you'd like to view a list of all submitted bug reports, then click below</p>
       <li><a href="{% url 'quizzes:viewbugreports' %}"> View Bug Reports</a></li>
       <br>
       {% else %}
