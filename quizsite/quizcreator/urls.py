@@ -1,3 +1,5 @@
+# Dylan O'Connell Quizsite. This stores all the URLs related to quizzes. Imported by quizsite/URLs.py
+
 from django.conf.urls import include, url
 from quizsite import views
 
@@ -9,7 +11,6 @@ urlpatterns = [
     url(r'^(?P<quiz_id>[0-9]+)/beginquiz$', views.beginquiz, name='beginquiz'),
     url(r'^(?P<quiz_id>[0-9]+)/endofquiz$', views.endofquiz, name='endofquiz'),
     url(r'^(?P<quiz_id>[0-9]+)/finishquiz$', views.finishquiz, name='finishquiz'),
-#    url(r'^(?P<quiz_id>[0-9]+)/submittedquiz$', views.submittedquiz, name='submittedquiz'),
     url(r'^(?P<quiz_id>[0-9]+)/checkresults$', views.checkresults, name='checkresults'),
     url(r'^(?P<quiz_id>[0-9]+)/(?P<username>\w+)/quizresults$', views.quizresults, name='quizresults'),
     url(r'^addanswer$', views.addanswer, name='addanswer'),

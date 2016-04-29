@@ -5,9 +5,13 @@
 {% block content %}
     <head>
         <base href="{% url 'quizzes:addquestion' %}" />
-        <title>"Add Question Forms"</title>
+        <title>"Add Quiz, Question, or Answer"</title>
     </head>
     <body>
+        <p> Once you hit submit, if it redirects you to this page, then the quiz/question/answer
+        has successfully been added to the database, and you can continue to add content. Otherwise, you 
+        will see an error message! </p>
+        <p> Add a new question to a quiz. Select the text and which quiz to add it to. </p>
         <form action="{% url 'quizzes:addquestion' %}" method="post">
             {% csrf_token %}
             <ol>
@@ -15,6 +19,7 @@
             </ol>
             <input type="submit" value="Add Question" />
         </form>
+        <p> Add a new answer. Add the text, the question it answers, and whether it is correct. </p>
         <form action="{% url 'quizzes:addanswer' %}" method="post">
             {% csrf_token %}
             <ol>
@@ -22,6 +27,7 @@
             </ol>
             <input type="submit" value="Add Answer" />
         </form>
+        <p> Create a new quiz. Select the name of the quiz and submit. </p>
         <form action="{% url 'quizzes:addquiz' %}" method="post">
             {% csrf_token %}
             <ol>

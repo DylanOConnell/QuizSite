@@ -2,7 +2,40 @@ Dylan O'Connell Quizsite Readme, Updated 04/29/2016
 Submitted in fulfillment of the CS306 Final Project 
 
 This readme is intended to help any reader understand the structure and organization of the website as well as its files. 
-We will discuss 1. the flow of the website, and how each page is used, and 2. the organization of its files.
+We will discuss 1. the structure of our models/SQL database 2. the flow of the website, and how each page is used, and 3. the organization of its files.
+
+
+First, we provide some brief notes on the site. The goal of this site is to allow instructors to create quizzes, for students to take the quizzes,
+and for instructors to be able to easily see the results of the scored quizzes. The chief concern was keeping the site simple. It should require no
+technical know-how to be able to use effectively. Due to the simple demands of our task, we wanted the site to be lightweight and versatile. To that end,
+the presentation of the site is extremely simplistic, using only basic HTML code. This has a number of advantages. It is extremely easy to use, will
+format correctly on almost any device, and is easy to interface with using other programs. This site is intended to be serious, and without distraction,
+and thus it is free from cluttering CSS, or Javascript that could break during a crucial testtaking scenario. 
+
+The site does its best to test every action the user makes, and verify that it is legal. It will only prevent actions that could interfere with the
+goals of the site itself, and will otherwise allow users to navigate the site through their own means, rather than the provided links. If it encounters
+an issue, the site will do its best to send the user to an error page (the error.html template), which displays a message which should help alert
+to what went wrong.
+
+The most important goals of the site are simplicity and consistent functionality. As it is still in its early developmental stages, it is bound 
+to encounter issues. It is hoped that the site is designed such that a small issue will not interfere with its core functionality. It also has a
+few means to fix any issues. Users can submit bug reports, so the administration can quickly fix any issues. The site is tested by Django Unittests, 
+which are in the quizcreator app (quizcreator/tests.py). One can run those tests to verify the functionality (they run in sqlite). Furthermore, I thank the Haverford Men's Crew team for its brief help in testing the site. I had a closed Beta on 4/28 where I asked ~10 users to register, take quizzes, and alert
+me to any issues that they found. This closed beta found several ways that the site's functionality was lacking or confusing, which was excellent help. The data from their tests has been cleaned from the database so that it is ready for launch during finals week.
+
+Above all, my thanks to Phil Adler, for his help with this project throughout this course. As a relative novice to any sort of software development,
+this was a fascinating foray into the complexities of this world. This tiny quizsite is (by an order of magnitude) the largest software project I have 
+worked on, and it was cool to it grow.
+
+==================================================
+0. Brief instructions for instructors.
+
+The site is designed to be used without outside help, as the links should be clear enough on the main page.
+Instructors must be superusers, contact the administrator for help in securing a superuser account. From the homepage,
+you should see several links called "Superuser tools". One will allow you to add quizzes, questions, and answers. Submit
+the forms on that page with the correct info until the quiz is created. Then, allow users to take the quiz.
+To see the results, use the Quiz Results link below, then navigate to the correct quiz and then correct user. This should 
+be relatively clear from the links on the site.
 
 =================================================
 1. The structure of the Django models/SQL Database.
@@ -125,3 +158,33 @@ it displays a bugreport form, which can only be submitted if a user is logged in
 
 p. viewbugreports, url = quizzes/viewbugreports
 Only for a superuser, this allows the superuser to view a list of all previously submitted bugreports.
+
+
+==========================================================================
+3. File structure
+/quizsite
+    This is the primary directory for our site. It contains readme.txt, and Django's manage.py. It has a series of subfolders
+
+    /quizcreator
+    This is a Django app. It is loaded by our primary app, quizsite. It has two important files
+
+        models.py: this contains the objects used by our database to form the backbone of the quiz system.
+        urls.py: this is imported by quizsite/urls.py, and contains the URLs for pages related to the quizzes
+        tests.py: these are the django unittests for the whole app. To run the unittests, go to /quizsite/, then 
+        run 'python manage.py test quizcreator' to see the results of the sqlite tests.
+
+    /quizsite
+    This is our primary Django app. It loads the models and URLs from quizcreator. Some notable files...
+        settings.py: stores our django settings.
+        urls.py: our main URL file. Imports quizcreator/urls.py and quizsite/account_urls.py, and tells Django which views to use for 
+            which URLs.
+        forms.py: stores our associated forms for our models.
+        
+    It also stores the templates
+        /templates
+            base.html: extended by all of our pages, provides useful links.
+            /registration
+                includes html files used for account creation
+            /quizsite
+                Includes all the html template files used by the quiz itself.
+           

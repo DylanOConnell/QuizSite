@@ -152,12 +152,12 @@ class AddToQuizViewsTestCase(TestCase):
             request.user = user
             response = addquestion(request)
             self.assertEqual(response.status_code, 200)
-            resp = self.client.get('/quizzes/addquestion/')
+            resp = self.client.get('/quizzes/addquestion')
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.context['user'], user)
-            self.assertTrue('quizresultform' in resp.context) 
-            self.assertTrue('answerresultform' in resp.context) 
-            self.assertTrue('questionresultform' in resp.context) 
+            self.assertTrue('quizform' in resp.context) 
+            self.assertTrue('answerform' in resp.context) 
+            self.assertTrue('questionform' in resp.context) 
 
 
 class UserMiscViewsTestCase(TestCase):
@@ -166,16 +166,90 @@ class UserMiscViewsTestCase(TestCase):
             """Verify that bugreport returns the proper response when accessed by a user """
             self.factory = RequestFactory()
             User.objects.create_user(username='testuser', password='testuser')
-            self.client = Client()
+            c = Client()
             user = User.objects.get(username='testuser')
             newbugreport = BugReport.objects.create(user=user, report="Why doesn't it use Javascript?")
-            self.client.login(username=user.username, password='testuser')
+            c.login(username=user.username, password='testuser')
             request = self.factory.get('/quizzes/bugreport/')
             request.user = user
             response = bugreport(request)
             self.assertEqual(response.status_code, 200)
-            resp = self.client.get('/quizzes/bugreport/')
+            resp = c.get('/quizzes/bugreport')
             self.assertEqual(resp.status_code, 200)
             self.assertEqual(resp.context['user'], user)
             self.assertTrue('bugreportform' in resp.context) 
-            self.assertTrue('timestamp' in resp.context) 
+
+class CheckResultsViewsTestCase(TestCase):
+        """This TestCase tests the views for checking quiz results """
+        def setUp(self):
+            """Create a sample database of our objects for testing"""
+            Quiz.objects.create(name="General Knowledge")
+            Quiz.objects.create(name="Haverford College Trivia")
+            Question.objects.create(text="When was Haverford founded?")
+            QuestionOrdering.objects.create(ordering=1, quiz=Quiz.objects.get(name="Haverford College Trivia"), question=Question.objects.get(text="When was Haverford founded?"))
+            QuestionOrdering.objects.create(ordering=1, quiz=Quiz.objects.get(name="General Knowledge"), question=Question.objects.get(text="When was Haverford founded?"))
+            Answer.objects.create(text="1823", correct_type="PART_W", question=Question.objects.get(text="When was Haverford founded?"))
+            Answer.objects.create(text="1833", correct_type="COR", question=Question.objects.get(text="When was Haverford founded?"))
+            Answer.objects.create(text="2012", correct_type="FULL_W", question=Question.objects.get(text="When was Haverford founded?"))
+            Question.objects.create(text="Who is your favorite professor?")
+            QuestionOrdering.objects.create(ordering=2, quiz=Quiz.objects.get(name="General Knowledge"), question=Question.objects.get(text="Who is your favorite professor?"))
+            Answer.objects.create(text="Einstein", correct_type="PART_W", question=Question.objects.get(text="Who is your favorite professor?"))
+            Answer.objects.create(text="Phil Adler", correct_type="COR", question=Question.objects.get(text="Who is your favorite professor?"))
+            Answer.objects.create(text="Genghis Khan", correct_type="FULL_W", question=Question.objects.get(text="Who is your favorite professor?"))
+            self.factory = RequestFactory()
+            User.objects.create_superuser(username='testuser', password='testuser', email='testuser@email.com')
+            self.client = Client()
+
+        def test_view_listquizresults(self):
+            """Verify that the listquizresults view returns a response with the proper forms when accessed by a user """
+            user = User.objects.get(username='testuser', is_superuser=True)
+            self.client.login(username=user.username, password='testuser')
+            genquiz = Quiz.objects.get(pk=1)
+            yearquestion = Question.objects.get(pk=1)
+            request = self.factory.get('/quizzes/listquizresults/')
+            request.user = user
+            response = addquestion(request)
+            self.assertEqual(response.status_code, 200)
+            resp = self.client.get('/quizzes/listquizresults')
+            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.context['user'], user)
+            self.assertTrue('quizzes_list' in resp.context) 
+            
+        def test_view_checkquizresults(self):
+            """Verify that the checkquizresults view returns a response with the proper forms when accessed by a user """
+            user = User.objects.get(username='testuser', is_superuser=True)
+            self.client.login(username=user.username, password='testuser')
+            genquiz = Quiz.objects.get(pk=1)
+            yearquestion = Question.objects.get(pk=1)
+            request = self.factory.get('/quizzes/{}/checkresults/'.format(genquiz.id))
+            request.user = user
+            response = addquestion(request)
+            self.assertEqual(response.status_code, 200)
+            resp = self.client.get('/quizzes/{}/checkresults'.format(genquiz.id))
+            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.context['user'], user)
+            self.assertEqual(resp.context['quiz'], genquiz)
+            self.assertTrue('user_list' in resp.context) 
+
+        def test_view_quizresults(self):
+            """Verify that the quizresults view returns a response with the proper forms when accessed by a user """
+            user = User.objects.get(username='testuser', is_superuser=True)
+            self.client.login(username=user.username, password='testuser')
+            genquiz = Quiz.objects.get(pk=1)
+            yearquestion = Question.objects.get(pk=1)
+            request = self.factory.get('/quizzes/{}/{}/quizresults/'.format(genquiz.id, user.username))
+            request.user = user
+            response = addquestion(request)
+            self.assertEqual(response.status_code, 200)
+            resp = self.client.get('/quizzes/{}/{}/quizresults'.format(genquiz.id, user.username))
+            self.assertEqual(resp.status_code, 200)
+            self.assertTrue('error' in resp.context) # there there is no valid quizresult, so this correctly throws error
+            QuizResult.objects.create(user=user, quiz=genquiz, score=0, finished=True)
+            request = self.factory.get('/quizzes/{}/{}/quizresults/'.format(genquiz.id, user.username))
+            request.user = user
+            response = addquestion(request)
+            self.assertEqual(response.status_code, 200)
+            resp = self.client.get('/quizzes/{}/{}/quizresults'.format(genquiz.id, user.username))
+            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.context['error'], 'There is not exactly one submitted answer for Quiz: General Knowledge, Question: Question #: 1. Answer: 1823') 
+
