@@ -187,4 +187,3 @@ Only for a superuser, this allows the superuser to view a list of all previously
                 includes html files used for account creation
             /quizsite
                 Includes all the html template files used by the quiz itself.
-           

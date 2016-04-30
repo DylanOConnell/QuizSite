@@ -1,7 +1,12 @@
+# This file implements Django's unittests. These will be run in a sqlite database, 
+# and will test the functionality of our models, views, and forms
 from django.test import TestCase, Client, RequestFactory
 from quizsite.views import *
 from quizcreator.models import *
-#from quizcreator.models import Quiz, Question, Answer, QuestionOrdering, QuizResult, AnswerResult, User
+from quizsite.forms import *
+
+
+# Tests our models in the database, and their expected properties
 class QuizModelsTestCase(TestCase):
         """This testcase covers the models in our database"""
         def setUp(self):
@@ -20,9 +25,15 @@ class QuizModelsTestCase(TestCase):
             genquiz = Quiz.objects.get(name="General Knowledge")
             hcquiz = Quiz.objects.get(name="Haverford College Trivia")
             hcquestion1 = Question.objects.get(text="When was Haverford founded?")
+            hcanswer1 = Answer.objects.get(text="2012")
+            hcquestion1 = Question.objects.get(text="When was Haverford founded?")
             self.assertEqual(genquiz.name, "General Knowledge")
             self.assertEqual(hcquiz.name, "Haverford College Trivia")
+            self.assertEqual(hcquestion1.text, "When was Haverford founded?")
+            self.assertEqual(hcanswer1.text, "2012")
 
+# We test the views that cover the beginning and ending of a quiz. Each test covers the functionality of 
+# that specific view.
 class BeginEndQuizViewsTestCase(TestCase):
         """This TestCase tests the view relating to beginning and ending quizzes"""
         def setUp(self):
@@ -76,6 +87,7 @@ class BeginEndQuizViewsTestCase(TestCase):
             self.assertEqual(resp.context['first_question'], Question.objects.all().first())
 
 
+# These tests cover the views related to taking the quiz as a user
 class QuizzesViewsTestCase(TestCase):
         """This TestCase tests the view relating to taking the quiz itself"""
         def setUp(self):
@@ -120,7 +132,7 @@ class QuizzesViewsTestCase(TestCase):
             self.assertTrue('answer_list' in resp.context) 
 
 
-
+# These tests cover the functionality of superusers adding content to the quizzes.
 class AddToQuizViewsTestCase(TestCase):
         """This TestCase tests the view that allows for the creation of quizzes, questions, and answers, 'addquestion' """
         def setUp(self):
@@ -160,6 +172,7 @@ class AddToQuizViewsTestCase(TestCase):
             self.assertTrue('questionform' in resp.context) 
 
 
+#These tests cover the functionality of the other miscellaneous pages used by the site
 class UserMiscViewsTestCase(TestCase):
         """This TestCase tests the views that handle miscellaneous tasks, bugreport and register """
         def test_view_bugreport(self):
@@ -179,6 +192,9 @@ class UserMiscViewsTestCase(TestCase):
             self.assertEqual(resp.context['user'], user)
             self.assertTrue('bugreportform' in resp.context) 
 
+
+# These tests cover the views used by superusers to view the scored quiz results of users.
+# each test covers the functionality of a different view.
 class CheckResultsViewsTestCase(TestCase):
         """This TestCase tests the views for checking quiz results """
         def setUp(self):
